@@ -81,8 +81,8 @@ const Header = () => {
         <div className="hidden lg:flex ml-28">
           <nav className="flex items-center space-x-4 lg:space-x-6">
             <Link
-              href="/"
-              className={pathname === '/' ? isSelectedStyle : style}
+              href="/home"
+              className={pathname === '/home' ? isSelectedStyle : style}
             >
               Principal
             </Link>
