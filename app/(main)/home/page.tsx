@@ -1,30 +1,43 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
-import React, { useEffect } from "react";
+import { TeamService } from "@/app/lib/services/teams.service";
+import React, { useEffect, useState } from "react";
+import { TeamMainInfo } from "@/app/lib/types/team.interface";
+import TeamsSlider from "./components/teamSlider";
 
 
 export default function Home() {
 
+    const[teams,setTeams] = useState<TeamMainInfo[]>([]);
+    const [error, setError] = useState<string | null>(null);
+
+
+
+
+
     useEffect(() => {
-        // const fetchEquipos = async () => {
-        //     try {
-        //         const teamsData = await ConexionSB.getEquipos();
-        //         if (teamsData) {
-        //             setTeamsData(teamsData);
-        //         }
-        //     } catch (error) {
-        //         console.error('Error al obtener equipos:', error);
-        //     }
-        // };
-        // fetchEquipos();
+        const loadTeams = async () => {
+            try {
+                const teamsData = await TeamService.getTeams();
+                console.log(teamsData[0].acronym);
+                if (teamsData) {
+                    setTeams(teamsData);
+                }
+            } catch (error) {
+                setError(error instanceof Error ? error.message : 'Failed to load teams');
+            }
+        };
+        loadTeams();
     }, []);
+
+
 
     return (
         <>
             {/* Seccion equipos */}
             <div className='mx-6 my-12'>
                 <h4 className='text-whiteColor font-roboto font-semibold text-2xl mb-6'>EQUIPOS</h4>
-                {/* <TeamsSlider ></TeamsSlider> */}
-
+                <TeamsSlider ></TeamsSlider>
             </div>
             {/* Seccion Partidos */}
             <div className='mx-6 my-12'>
