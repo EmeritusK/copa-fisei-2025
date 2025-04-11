@@ -16,9 +16,9 @@ const Header = () => {
   const styleMobile =
     'text-xl font-light transition-colors text-greyColor py-4 text-center';
   const isSelectedStyle =
-    'text-sm font-medium transition-colors text-greyColor hover:border-b-2 hover:border-greyColor pb-1 border-b-2 border-greyColor';
+    'text-sm font-bold transition-colors text-greyColor hover:border-b-2 hover:border-greyColor pb-1 border-b-2 border-greyColor';
   const isSelectedMobileStyle =
-    'text-xl font-medium transition-colors text-greyColor pb-1 border-greyColor py-4 text-center';
+    'text-xl font-bold transition-colors text-greyColor pb-1 border-greyColor py-4 text-center';
 
   return (
     <>
@@ -87,22 +87,22 @@ const Header = () => {
               Principal
             </Link>
             <Link
-              href="/clasificaciones"
+              href="/rankings"
               className={
-                pathname === '/clasificaciones' ? isSelectedStyle : style
+                pathname === '/rankings' ? isSelectedStyle : style
               }
             >
               Clasificaciones
             </Link>
             <Link
-              href="/partidos"
-              className={pathname === '/partidos' ? isSelectedStyle : style}
+              href="/matches"
+              className={pathname === '/matches' ? isSelectedStyle : style}
             >
               Partidos
             </Link>
             <Link
-              href="/equipos"
-              className={pathname === '/equipos' ? isSelectedStyle : style}
+              href="/teams"
+              className={pathname === '/teams' ? isSelectedStyle : style}
             >
               Equipos
             </Link>
@@ -110,16 +110,16 @@ const Header = () => {
         </div>
       </div>
       {isMenuOpen && (
-        <div className="z-50 fixed inset-x-0">
+        <div className="z-50 fixed inset-x-0 h-screen">
           <div className="z-50 bg-primaryBlueColor">
             <nav className="z-50">
               <Link
-                href="/"
-                className={`block ${pathname === '/' ? isSelectedMobileStyle : styleMobile
+                href="/home"
+                className={`block ${pathname === '/home' ? isSelectedMobileStyle : styleMobile
                   }`}
               >
                 <span
-                  className={`${pathname === '/'
+                  className={`${pathname === '/home'
                       ? 'border-b-2 pb-2 border-gray-300 inline-block'
                       : 'hover:border-b-2 hover:pb-2 hover:border-gray-300'
                     }`}
@@ -128,14 +128,14 @@ const Header = () => {
                 </span>
               </Link>
               <Link
-                href="/clasificaciones"
-                className={`block ${pathname === '/clasificaciones'
+                href="/rankings"
+                className={`block ${pathname === '/rankings'
                     ? isSelectedMobileStyle
                     : styleMobile
                   }`}
               >
                 <span
-                  className={`${pathname === '/clasificaciones'
+                  className={`${pathname === '/rankings'
                       ? 'border-b-2 pb-2 border-gray-300 inline-block'
                       : 'hover:border-b-2 hover:pb-2 hover:border-gray-300'
                     }`}
@@ -144,12 +144,12 @@ const Header = () => {
                 </span>
               </Link>
               <Link
-                href="/partidos"
-                className={`block ${pathname === '/partidos' ? isSelectedMobileStyle : styleMobile
+                href="/matches"
+                className={`block ${pathname === '/matches' ? isSelectedMobileStyle : styleMobile
                   }`}
               >
                 <span
-                  className={`${pathname === '/partidos'
+                  className={`${pathname === '/matches'
                       ? 'border-b-2 pb-2 border-gray-300 inline-block'
                       : 'hover:border-b-2 hover:pb-2 hover:border-gray-300'
                     }`}
@@ -158,12 +158,12 @@ const Header = () => {
                 </span>
               </Link>
               <Link
-                href="/equipos"
-                className={` block ${pathname === '/equipos' ? isSelectedMobileStyle : styleMobile
+                href="/teams"
+                className={` block ${pathname === '/teams' ? isSelectedMobileStyle : styleMobile
                   }`}
               >
                 <span
-                  className={`${pathname === '/equipos'
+                  className={`${pathname === '/teams'
                       ? 'border-b-2 pb-2 border-gray-300 inline-block'
                       : 'hover:border-b-2 hover:pb-2 hover:border-gray-300'
                     }`}
