@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
 import { TeamService } from "@/app/lib/services/teams.service";
 
-function LittleTeamCard({ team }: { team: TeamMainInfo }) {
+function SmallTeamCard({ team }: { team: TeamMainInfo }) {
     const { id, name, acronym } = team; // Recibiendo las props id y abreviatura
     const [image, setImage] = useState('');
     const router = useRouter();
@@ -52,6 +52,6 @@ function LittleTeamCard({ team }: { team: TeamMainInfo }) {
 }
 
 
-export default LittleTeamCard;
+export default SmallTeamCard;
 
 

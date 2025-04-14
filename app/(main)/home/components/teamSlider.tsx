@@ -2,8 +2,8 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import Slider from "react-slick";
-import LittleTeamCard from './littleTeamCard';
 import { TeamService } from '@/app/lib/services/teams.service';
+import SmallTeamCard from './smallTeamCard';
 
 
 
@@ -41,7 +41,7 @@ function TeamsSlider() {
                 for (const team of teamsData) {
                     teamsSlider.push(
                         <div key={team.id}>
-                            <LittleTeamCard team={team}/>
+                            <SmallTeamCard team={team}/>
                         </div>
                     )
                 }

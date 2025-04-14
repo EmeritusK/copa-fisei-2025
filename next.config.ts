@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/storage/v1/object/public/team-logos/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'mqsikcvonyfulmbpyvts.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/players-images/**',
+      },
     ],
   },
 };

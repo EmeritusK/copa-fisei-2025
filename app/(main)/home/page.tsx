@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
-import { TeamService } from "@/app/lib/services/teams.service";
 import React, { useEffect, useState } from "react";
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
 import TeamsSlider from "./components/teamSlider";
+import { TeamService } from "@/app/lib/services/teams.service";
 
 
 export default function Home() {
