@@ -43,13 +43,13 @@ export default function Page() {
     return <>
     <div className='m-12'>
     <div>
-            <div className="bg-primaryBlueColor p-4 rounded-4xl flex flex-wrap items-center justify-center">
-                    <div className="w-64 h-64 relative items-center justify-center ">
+            <div className="bg-primaryBlueColor p-4 rounded-3xl flex flex-wrap sm:items-center sm:justify-center md:items-start md:justify-start">
+                    <div className="w-64 h-auto relative items-center justify-center ">
                         {image ? (
                             <Image
                                 src={image}
                                 width={100}
-                                height={100}
+                                height={0}
                                 alt="Logo del equipo"
                                 className="w-full h-full"
                             />
@@ -70,7 +70,7 @@ export default function Page() {
             <div className="bg-primaryBlueColor p-3 rounded-xl mt-8">
             <h4 className='text-whiteColor body-font font-roboto font-bold text-xl'>JUGADORES DEL EQUIPO</h4>
             </div>
-            <div className='grid md:grid-cols-4 sm:grid-cols-2 justify-between gap-3'>
+            <div className='grid md:grid-cols-3 sm:grid-cols-2 justify-between gap-3'>
                 {playersData.map((player) => (
                     <PlayerCard key={player.id} player={player} ></PlayerCard>
                 ))}

@@ -5,6 +5,13 @@ export class DatabaseError extends Error {
     }
 }
 
+export class ImageNotFoundError extends DatabaseError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'ImageNotFoundError';
+    }
+}
+
 export class NoDataError extends DatabaseError {
     constructor(entity: string) {
         super(`No se encontraron registros de ${entity}`);
