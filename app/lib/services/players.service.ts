@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createClient } from "@/utils/supabase/client";
 import { Player } from "../types/player.interface";
-import { DatabaseError, NoDataError } from "../errors/database.errors";
+import { DatabaseError, ImageNotFoundError, NoDataError } from "../errors/database.errors";
 
 
 
@@ -57,27 +58,23 @@ export class PlayerService {
                     .from('players-images')
                     .getPublicUrl(`${playerId}.${format}`);
                 
-                const imageExists = await this.checkImageExists(data.publicUrl);
+                const img = new Image();
+                await new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                    img.src = data.publicUrl;
+                });
                 
-                if (imageExists) {
+                if (img.complete && img.naturalHeight !== 0) {
                     return data.publicUrl;
                 }
             }
             
-            throw new Error(`No se encontró logo para el jugador ${playerId} en ningún formato soportado`);
+            return ''; // Retorna cadena vacía si no se encuentra la imagen
         } catch (error) {
-            console.error('Error getting team logo:', error);
-            throw error;
+            console.error('Error getting player image:', error);
+            return '';
         }
     }
-    
-    private static async checkImageExists(url: string): Promise<boolean> {
-        try {
-            const response = await fetch(url, { method: 'HEAD' });
-            return response.ok;
-        } catch {
-            return false;
-        }
-    }
-    
+
 }

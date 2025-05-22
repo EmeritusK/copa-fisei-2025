@@ -1,11 +1,33 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createClient } from '@/utils/supabase/client';
-import { DatabaseError, NoDataError } from '../errors/database.errors';
+import { DatabaseError, ImageNotFoundError, NoDataError } from '../errors/database.errors';
 import { TeamMainInfo } from '../types/team.interface';
 
 export class TeamService {
-
     static supabase = createClient();
 
+    static defaultImage = "https://mqsikcvonyfulmbpyvts.supabase.co/storage/v1/object/public/team-logos//default.svg";
+
+
+    static async getTeamById({ teamId }: { teamId: string }): Promise<TeamMainInfo> {
+        try {
+            const { data, error } = await this.supabase
+                .from('teams')
+                .select('*')
+                .eq('id', teamId)
+                .single();
+
+
+            if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
+            if (!data) throw new NoDataError('No se encontró el equipo');
+
+
+            return data as TeamMainInfo;
+        } catch (error) {
+            console.error('Error fetching team:', error);
+            throw error;
+        }
+    }
 
     static async getTeams(): Promise<TeamMainInfo[]> {
         try {
@@ -26,34 +48,21 @@ export class TeamService {
 
     static async getTeamLogoUrl({ teamId }: { teamId: string }): Promise<string> {
         try {
-            const supportedFormats = ['png', 'jpg', 'jpeg', 'webp', 'svg'];
+            const { data } = this.supabase
+                .storage
+                .from('team-logos')
+                .getPublicUrl(`${teamId}.svg`);
+
+
+                return data.publicUrl;
             
-            for (const format of supportedFormats) {
-                const { data } = this.supabase
-                    .storage
-                    .from('team-logos')
-                    .getPublicUrl(`${teamId}.${format}`);
-                
-                const imageExists = await this.checkImageExists(data.publicUrl);
-                
-                if (imageExists) {
-                    return data.publicUrl;
-                }
-            }
-            
-            throw new Error(`No se encontró logo para el equipo ${teamId} en ningún formato soportado`);
         } catch (error) {
+            if (error instanceof ImageNotFoundError) {
+                return this.defaultImage;
+            }
             console.error('Error getting team logo:', error);
             throw error;
         }
     }
-    
-    private static async checkImageExists(url: string): Promise<boolean> {
-        try {
-            const response = await fetch(url, { method: 'HEAD' });
-            return response.ok;
-        } catch {
-            return false;
-        }
-    }
+
 }
