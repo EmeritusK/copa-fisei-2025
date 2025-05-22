@@ -1,4 +1,3 @@
-
 import { createBrowserClient } from "@supabase/ssr";
 
 export const createClient = () =>
@@ -7,4 +6,5 @@ export const createClient = () =>
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     );
 
-    
+// Add this line to export createClient as the default export
+export default createClient;
