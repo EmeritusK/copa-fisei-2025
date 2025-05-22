@@ -8,6 +8,27 @@ export class TeamService {
 
     static defaultImage = "https://mqsikcvonyfulmbpyvts.supabase.co/storage/v1/object/public/team-logos//default.svg";
 
+
+    static async getTeamById({ teamId }: { teamId: string }): Promise<TeamMainInfo> {
+        try {
+            const { data, error } = await this.supabase
+                .from('teams')
+                .select('*')
+                .eq('id', teamId)
+                .single();
+
+
+            if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
+            if (!data) throw new NoDataError('No se encontró el equipo');
+
+
+            return data as TeamMainInfo;
+        } catch (error) {
+            console.error('Error fetching team:', error);
+            throw error;
+        }
+    }
+
     static async getTeams(): Promise<TeamMainInfo[]> {
         try {
             const { data, error } = await this.supabase
@@ -27,14 +48,14 @@ export class TeamService {
 
     static async getTeamLogoUrl({ teamId }: { teamId: string }): Promise<string> {
         try {
+            const { data } = this.supabase
+                .storage
+                .from('team-logos')
+                .getPublicUrl(`${teamId}.svg`);
 
-                const { data } = this.supabase
-                    .storage
-                    .from('team-logos')
-                    .getPublicUrl(`${teamId}.svg`);
 
-                    return data.publicUrl;
-
+                return data.publicUrl;
+            
         } catch (error) {
             if (error instanceof ImageNotFoundError) {
                 return this.defaultImage;
