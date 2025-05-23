@@ -87,9 +87,9 @@ const Header = () => {
               Principal
             </Link>
             <Link
-              href="/rankings"
+              href="/ranking"
               className={
-                pathname === '/rankings' ? isSelectedStyle : style
+                pathname === '/ranking' ? isSelectedStyle : style
               }
             >
               Clasificaciones
@@ -102,7 +102,7 @@ const Header = () => {
             </Link>
             <Link
               href="/teams"
-              className={pathname === '/teams' ? isSelectedStyle : style}
+              className={pathname.startsWith('/teams') ? isSelectedStyle : style}
             >
               Equipos
             </Link>
@@ -128,14 +128,14 @@ const Header = () => {
                 </span>
               </Link>
               <Link
-                href="/rankings"
-                className={`block ${pathname === '/rankings'
+                href="/ranking"
+                className={`block ${pathname === '/ranking'
                     ? isSelectedMobileStyle
                     : styleMobile
                   }`}
               >
                 <span
-                  className={`${pathname === '/rankings'
+                  className={`${pathname === '/ranking'
                       ? 'border-b-2 pb-2 border-gray-300 inline-block'
                       : 'hover:border-b-2 hover:pb-2 hover:border-gray-300'
                     }`}
