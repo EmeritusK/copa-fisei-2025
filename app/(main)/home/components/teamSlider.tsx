@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Slider from "react-slick";
 import { TeamService } from '@/app/lib/services/teams.service';
 import SmallTeamCard from './smallTeamCard';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 
 
