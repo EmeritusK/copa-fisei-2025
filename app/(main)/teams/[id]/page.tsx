@@ -7,6 +7,7 @@ import { Player } from "@/app/lib/types/player.interface";
 import { TeamService } from "@/app/lib/services/teams.service";
 import { PlayerService } from "@/app/lib/services/players.service";
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
+import { TeamMainInfo } from "@/app/lib/types/team.interface";
 
 
 
@@ -56,6 +57,16 @@ export default function Page() {
                         ) : (
                             <div className="w-full h-full animate-pulse bg-gray-300 rounded-full" />
                         )}
+                    </div>
+                    <div className="w-[5%]"></div>
+                <div className="flex w-[85%] items-center justify-start">
+                    <h3 className="my-4 text-whiteColor font-roboto font-black text-5xl uppercase">
+                        {team?.name} 
+                        <p className="text-whiteColor font-roboto font-black text-xl uppercase mt-2">
+                        {team?.career_acronym}
+                        </p>
+
+                        </h3>
                     </div>
                     <div className="w-[5%]"></div>
                 <div className="flex w-[85%] items-center justify-start">

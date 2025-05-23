@@ -36,6 +36,7 @@ export default function TeamCard({ team }: { team: TeamMainInfo }) {
                 className="cursor-pointer hover:cursor-pointer bg-primaryBlueColor h-24 w-72 grid grid-cols-3 gap-0 justify-start items-center rounded-lg">
                 <div className="w-8">
                     <div className="ml-2 w-16 h-full p-1 overflow-hidden">
+                    <div className="ml-2 w-16 h-full p-1 overflow-hidden">
                         {image ? (
                             <Image
                                 src={image}
