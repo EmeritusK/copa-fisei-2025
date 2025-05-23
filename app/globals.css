@@ -13,6 +13,8 @@
   --font-roboto: "Roboto", "sans-serif";
   --color-primaryBlueColor: var(--primaryBlueColor);
   --color-greyColor: var(--greyColor);
+  --color-grayBorderColor: var(--grayBorderColor);
+  --color-blueButtonColor: var(--blueButtonColor);
   --color-greenColor: var(--greenColor);
   --color-whiteColor: var(--whiteColor);
   --color-secondaryGreenColor: var(--secondaryGreenColor);
@@ -29,8 +31,10 @@
   :root {
     --background: #040A1A;
     --foreground: #ededed;
-    --primaryBlueColor: #0b183c;
+    --primaryBlueColor: #161B2E;
     --greyColor: #f9f9f9;
+    --grayBorderColor: #5E6376;
+    --blueButtonColor: #0081DC;
     --greenColor: #2bd09c;
     --whiteColor: #f3f3f3;
     --secondaryGreenColor: #94c2b9;
@@ -46,4 +50,25 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-roboto);
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grayBorderColor);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--blueButtonColor);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--grayBorderColor) transparent;
 }
