@@ -1,3 +1,4 @@
+
 'use client'
 import React, { useEffect, useState } from "react";
 import Image from 'next/image';
@@ -21,7 +22,6 @@ export default function TeamCard({ team }: { team: TeamMainInfo }) {
 
     async function openSinglePage() {
         router.push(`/teams/${team.name}=${team.id}`);
-
     }
 
     const truncateText = (text: string, maxLength: number) => {
@@ -35,8 +35,7 @@ export default function TeamCard({ team }: { team: TeamMainInfo }) {
             <div onClick={openSinglePage}
                 className="cursor-pointer hover:cursor-pointer bg-primaryBlueColor h-24 w-72 grid grid-cols-3 gap-0 justify-start items-center rounded-lg">
                 <div className="w-8">
-                    <div className="ml-2 w-16 h-full p-1 overflow-hidden">
-                    <div className="ml-2 w-16 h-full p-1 overflow-hidden">
+                    <div className="ml-2 w-18 h-full p-1 overflow-hidden">
                         {image ? (
                             <Image
                                 src={image}
@@ -52,7 +51,7 @@ export default function TeamCard({ team }: { team: TeamMainInfo }) {
                 </div>
                 <div className="ml-2 w-36 grid-rows-2">
                     <div className="max-w-xs">
-                        <p className="mb-1 text-whiteColor body-font font-roboto font-bold text-lg">{truncateText(team.name, 14)}</p>
+                        <p className="mb-1 text-whiteColor body-font font-roboto font-bold text-[0.9rem]">{truncateText(team.name, 14)}</p>
                     </div>
                     <p className="flex items-center gap-2 text-whiteColor body-font font-roboto font-regular text-sm">
                         <svg width="16" height="16" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -67,5 +66,3 @@ export default function TeamCard({ team }: { team: TeamMainInfo }) {
 
     </>
 }
-
-
