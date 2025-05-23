@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from 'next/image';
 import { Player } from "@/app/lib/types/player.interface";
 import { PlayerService } from "@/app/lib/services/players.service";
+import { FaBook } from "react-icons/fa";
 
 export default function PlayerCard({ player }: { player: Player }) {
 
@@ -39,9 +40,12 @@ export default function PlayerCard({ player }: { player: Player }) {
                     <p className="mb-1 min-w-full text-whiteColor font-roboto font-semibold uppercase text-lg whitespace-nowrap overflow-hidden text-ellipsis">
                         {player.name}
                     </p>
-                    <p className="text-whiteColor font-roboto font-semibold text-xs whitespace-nowrap overflow-hidden text-ellipsis">
-                        {player.career}
-                    </p>
+                    <div className="text-whiteColor flex w-full font-roboto font-semibold text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+                    <div className="mr-2 w-[5%] flex items-center justify-center">
+                    <FaBook />
+                    </div>
+                    <p className="w-[65%] whitespace-nowrap overflow-hidden text-ellipsis">{player.career}</p>
+                    </div>
                     <div className="self-end align-bottom -m-4">
                         <div className="bg-greenColor h-8 w-14 flex items-center justify-center rounded-l-sm">
                             <p className="text-whiteColor body-font font-roboto font-semibold text-xl">#{player.jersey_number}</p>
