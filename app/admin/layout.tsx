@@ -1,0 +1,15 @@
+import Header from "../(main)/components/header"
+
+// app/(main)/layout.tsx
+export default function AdminLayout({
+    children,
+}: {
+    children: React.ReactNode
+}) {
+    return (
+        <div className="main-layout min-h-screen bg-background flex flex-col">
+            <Header></Header>  
+            <main className="flex-grow">{children}</main>
+        </div>
+    )
+}
