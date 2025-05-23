@@ -29,27 +29,6 @@ export class TeamService {
         }
     }
 
-
-    static async getTeamById({ teamId }: { teamId: string }): Promise<TeamMainInfo> {
-        try {
-            const { data, error } = await this.supabase
-                .from('teams')
-                .select('*')
-                .eq('id', teamId)
-                .single();
-
-
-            if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            if (!data) throw new NoDataError('No se encontró el equipo');
-
-
-            return data as TeamMainInfo;
-        } catch (error) {
-            console.error('Error fetching team:', error);
-            throw error;
-        }
-    }
-
     static async getTeams(): Promise<TeamMainInfo[]> {
         try {
             const { data, error } = await this.supabase
