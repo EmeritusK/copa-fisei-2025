@@ -39,9 +39,9 @@ const MatchInfo = styled.div`
     color: #555;
 `;
 
-const MatchStatus = styled.div<{ finalizado?: boolean }>`
+const MatchStatus = styled.div<{ $finalizado?: boolean }>`
     font-size: 14px;
-    color: ${props => (props.finalizado ? 'red' : '#555')};
+    color: ${props => (props.$finalizado ? 'red' : '#555')};
     font-weight: bold;
 `;
 
@@ -97,7 +97,7 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
             {matches.map(match => (
                 <MatchCard key={match.match_id}>
                     {match.status === 'FINALIZADO' ? (
-                        <MatchStatus finalizado>{`Finalizado: ${match.home_team.home_team_goals} - ${match.away_team.away_team_goals}`}</MatchStatus>
+                        <MatchStatus $finalizado={true}>{`Finalizado: ${match.home_team.home_team_goals} - ${match.away_team.away_team_goals}`}</MatchStatus>
                     ) : (
                         <MatchStatus>Programado</MatchStatus>
                     )}
@@ -113,7 +113,11 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
                         </div>
                     </TeamRow>
                     <MatchInfo>
-                        {new Date(match.date).toLocaleDateString()} {match.time}
+                        {(() => {
+                            const date = new Date(match.date);
+                            date.setDate(date.getDate() + 1);
+                            return date.toLocaleDateString();
+                        })()} {match.time}
                     </MatchInfo>
                 </MatchCard>
             ))}
