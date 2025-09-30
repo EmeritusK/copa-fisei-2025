@@ -60,7 +60,7 @@ export const TablePosicion = () => {
             <div className="container   px-4 mx-auto sm:px-8 ">
                 <div className="py-5">
                     <div className="flex flex-row justify-between  w-full mb-1 sm:mb-0">
-                        <h2 className="text-3xl leading-tight m-2 font-roboto font-bold  text-white">
+                        <h2 className="text-3xl leading-tight m-2 font-roboto font-bold text-foreground">
                             GRUPO A
                         </h2>
 
@@ -77,25 +77,25 @@ export const TablePosicion = () => {
                                         <th scope="col" className="px-5 py-1  text-lg font-mono font-normal  text-left text-gray-400   border-b border-bgColor">
 
                                         </th>
-                                        <th scope="col" className="px-7 py-1 w-2 text-md font-mono font-semibold text-right text-gray-400   border-b border-bgColor">
+                                        <th scope="col" className="px-7 py-1 w-2 text-md font-mono font-semibold text-right text-greyColor   border-b border-bgColor">
                                             Partidos
                                         </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-gray-400  border-b border-bgColor">
+                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">
                                             V
                                         </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-gray-400  border-b border-bgColor">
+                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">
                                             E
                                         </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-gray-400   border-b border-bgColor">
+                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">
                                             D
                                         </th>
-                                        <th scope="col" className=" py-1 w-4 text-md font-mono font-semibold text-center text-gray-400   border-b border-bgColor">
+                                        <th scope="col" className=" py-1 w-4 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">
                                             Goles
                                         </th>
-                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono font-semibold text-center  text-gray-400   border-b border-bgColor">
+                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono font-semibold text-center  text-greyColor   border-b border-bgColor">
                                             +/-
                                         </th>
-                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono  text-right text-gray-400  border-b border-bgColor">
+                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono  text-right text-greyColor  border-b border-bgColor">
                                             Puntos
                                         </th>
                                     </tr>
@@ -104,7 +104,7 @@ export const TablePosicion = () => {
                                     {positions?.data.A.map((team, index) => (
                                         <tr key={team.team_id}>
                                             <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <p className="text-gray-400">{index + 1}</p>
+                                                <p className="text-greyColor">{index + 1}</p>
                                             </td>
                                             <td className="px-5 py-2 text-sm border-b border-bgColor">
                                                 <div className="w-10 h-full">
@@ -120,28 +120,28 @@ export const TablePosicion = () => {
                                                 </div>
                                             </td>
                                             <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <p className="text-white font-semibold hover:text-gray-400 cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})} >{team.team_name}</p>
+                                                <p className="text-foreground font-semibold hover:text-greyColor cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})} >{team.team_name}</p>
                                             </td>
                                             <td className="px-5 py-2 text-sm border-b border-bgColor text-center">
-                                                <p className="text-gray-400">{team.matches_played}</p>
+                                                <p className="text-greyColor">{team.matches_played}</p>
                                             </td>
                                             <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.wins}</p>
+                                                <p className="text-greyColor">{team.wins}</p>
                                             </td>
                                             <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.draws}</p>
+                                                <p className="text-greyColor">{team.draws}</p>
                                             </td>
                                             <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.losses}</p>
+                                                <p className="text-greyColor">{team.losses}</p>
                                             </td>
                                             <td className="px-3 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400 min-w-[60px]">{team.goals_for} - {team.goals_against}</p>
+                                                <p className="text-greyColor min-w-[60px]">{team.goals_for} - {team.goals_against}</p>
                                             </td>
                                             <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.goal_difference}</p>
+                                                <p className="text-greyColor">{team.goal_difference}</p>
                                             </td>
                                             <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.points}</p>
+                                                <p className="text-greyColor">{team.points}</p>
                                             </td>
                                         </tr>
                                     ))}
@@ -149,7 +149,7 @@ export const TablePosicion = () => {
 
                                 </tbody>
                             </table>
-                            <div className="flex flex-col items-center px-5 py-5 bg-gray-900 xs:flex-row xs:justify-between border-t border-bgColor">
+                            <div className="flex flex-col items-center px-5 py-5 bg-primaryBlueColor xs:flex-row xs:justify-between border-t border-bgColor">
 
                             </div>
 
@@ -158,7 +158,7 @@ export const TablePosicion = () => {
                 </div>
                 <div className="py-5">
                     <div className="flex flex-row justify-between  w-full mb-1 sm:mb-0">
-                        <h2 className="text-3xl leading-tight m-2 font-roboto font-bold  text-white">
+                        <h2 className="text-3xl leading-tight m-2 font-roboto font-bold text-foreground">
                             GRUPO B
                         </h2>
 
@@ -175,25 +175,25 @@ export const TablePosicion = () => {
                                         <th scope="col" className="px-5 py-1  text-lg font-mono font-normal  text-left text-gray-400   border-b border-bgColor">
 
                                         </th>
-                                        <th scope="col" className="px-7 py-1 w-2 text-md font-mono font-semibold text-right text-gray-400   border-b border-bgColor">
+                                        <th scope="col" className="px-7 py-1 w-2 text-md font-mono font-semibold text-right text-greyColor   border-b border-bgColor">
                                             Partidos
                                         </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-gray-400  border-b border-bgColor">
+                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">
                                             V
                                         </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-gray-400  border-b border-bgColor">
+                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">
                                             E
                                         </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-gray-400   border-b border-bgColor">
+                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">
                                             D
                                         </th>
-                                        <th scope="col" className=" py-1 w-4 text-md font-mono font-semibold text-center text-gray-400   border-b border-bgColor">
+                                        <th scope="col" className=" py-1 w-4 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">
                                             Goles
                                         </th>
-                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono font-semibold text-center  text-gray-400   border-b border-bgColor">
+                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono font-semibold text-center  text-greyColor   border-b border-bgColor">
                                             +/-
                                         </th>
-                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono  text-right text-gray-400  border-b border-bgColor">
+                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono  text-right text-greyColor  border-b border-bgColor">
                                             Puntos
                                         </th>
                                     </tr>
@@ -202,7 +202,7 @@ export const TablePosicion = () => {
                                     {positions?.data.B.map((team, index) => (
                                         <tr key={team.team_id}>
                                             <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <p className="text-gray-400">{index + 1}</p>
+                                                <p className="text-greyColor">{index + 1}</p>
                                             </td>
                                             <td className="px-5 py-2 text-sm border-b border-bgColor">
                                                 <div className="w-10 h-full">
@@ -218,28 +218,28 @@ export const TablePosicion = () => {
                                                 </div>
                                             </td>
                                             <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <p className="text-white font-semibold hover:text-gray-400 cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})} >{team.team_name}</p>
+                                                <p className="text-foreground font-semibold hover:text-greyColor cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})} >{team.team_name}</p>
                                             </td>
                                             <td className="px-5 py-2 text-sm border-b border-bgColor text-center">
-                                                <p className="text-gray-400">{team.matches_played}</p>
+                                                <p className="text-greyColor">{team.matches_played}</p>
                                             </td>
                                             <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.wins}</p>
+                                                <p className="text-greyColor">{team.wins}</p>
                                             </td>
                                             <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.draws}</p>
+                                                <p className="text-greyColor">{team.draws}</p>
                                             </td>
                                             <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.losses}</p>
+                                                <p className="text-greyColor">{team.losses}</p>
                                             </td>
                                             <td className="px-3 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400 min-w-[60px]">{team.goals_for} - {team.goals_against}</p>
+                                                <p className="text-greyColor min-w-[60px]">{team.goals_for} - {team.goals_against}</p>
                                             </td>
                                             <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.goal_difference}</p>
+                                                <p className="text-greyColor">{team.goal_difference}</p>
                                             </td>
                                             <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-gray-400">{team.points}</p>
+                                                <p className="text-greyColor">{team.points}</p>
                                             </td>
                                         </tr>
                                     ))}
@@ -247,7 +247,7 @@ export const TablePosicion = () => {
 
                                 </tbody>
                             </table>
-                            <div className="flex flex-col items-center px-5 py-5 bg-gray-900 xs:flex-row xs:justify-between border-t border-bgColor">
+                            <div className="flex flex-col items-center px-5 py-5 bg-primaryBlueColor xs:flex-row xs:justify-between border-t border-bgColor">
 
                             </div>
 
