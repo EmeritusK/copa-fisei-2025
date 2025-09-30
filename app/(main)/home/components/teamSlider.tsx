@@ -55,6 +55,7 @@ function TeamsSlider() {
     };
     const settings = {
         dots: true,
+        arrows: true,
         infinite: false,
         speed: 500,
         slidesToShow: 14, // Cantidad de elementos a mostrar en pantalla
@@ -76,24 +77,32 @@ function TeamsSlider() {
                 breakpoint: 768,
                 settings: {
                     slidesToShow: 6,
+                    arrows: false,
+                    dots: false,
                 },
             },
             {
                 breakpoint: 575,
                 settings: {
                     slidesToShow: 5,
+                    arrows: false,
+                    dots: false,
                 },
             },
             {
                 breakpoint: 470,
                 settings: {
                     slidesToShow: 4,
+                    arrows: false,
+                    dots: false,
                 },
             },
             {
                 breakpoint: 410,
                 settings: {
                     slidesToShow: 3,
+                    arrows: false,
+                    dots: false,
                 },
             },
         ],

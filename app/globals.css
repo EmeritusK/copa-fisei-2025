@@ -98,6 +98,21 @@ body {
 .slick-next:before {
   color: var(--foreground) !important;
 }
+.slick-slider {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .slick-slider {
+    padding: 0 8px;
+  }
+  .slick-list {
+    overflow: visible;
+  }
+  .slick-dots {
+    bottom: -18px;
+  }
+}
 
 .slick-dots li button:before {
   color: var(--greyColor) !important;
