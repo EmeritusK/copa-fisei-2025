@@ -84,3 +84,18 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--grayBorderColor) transparent;
 }
+
+/* Slick slider arrows and dots themed */
+.slick-prev:before,
+.slick-next:before {
+  color: var(--foreground) !important;
+}
+
+.slick-dots li button:before {
+  color: var(--greyColor) !important;
+  opacity: 0.5 !important;
+}
+.slick-dots li.slick-active button:before {
+  color: var(--blueButtonColor) !important;
+  opacity: 1 !important;
+}
