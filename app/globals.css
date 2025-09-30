@@ -42,8 +42,7 @@
   --color-foreground: var(--foreground);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+html[data-theme="dark"] {
     --background: #040A1A;
     --foreground: #ededed;
     --primaryBlueColor: #161B2E;
@@ -61,7 +60,6 @@
     --bgColor: #040a1a;
     --headerFrom: #0b1120;
     --headerTo: #161b2e;
-  }
 }
 
 body {

@@ -1,13 +1,33 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import mainIcon from '../../assets/svg/logoASO.svg';
 import espnIcon from '../../assets/svg/FISEI.svg';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') return 'light';
+    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (stored) return stored;
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const html = document.documentElement;
+      if (theme === 'dark') html.setAttribute('data-theme', 'dark');
+      else html.removeAttribute('data-theme');
+      localStorage.setItem('theme', theme);
+    }
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  }
 
   const pathname = usePathname();
   console.log(pathname);
@@ -24,13 +44,7 @@ const Header = () => {
     <>
       <div className="z-50 justify-start px-2 items-center lg:flex sticky top-0 app-header shadow">
         <div className="flex py-4 px-1 max-w-7xl justify-between">
-          <Image
-            priority
-            src={mainIcon}
-            alt="icono_campeonato"
-            width={240}
-            height={240}
-          />
+
           <div className="flex lg:hidden py-4 px-1 max-w-7xl justify-end">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {!isMenuOpen ? (
@@ -78,7 +92,7 @@ const Header = () => {
             className="ml-4"
           />
         </div>
-        <div className="hidden lg:flex ml-28">
+        <div className="hidden lg:flex ml-28 w-full items-center">
           <nav className="flex items-center space-x-4 lg:space-x-6">
             <Link
               href="/home"
@@ -107,6 +121,27 @@ const Header = () => {
               Equipos
             </Link>
           </nav>
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            aria-pressed={theme === 'dark'}
+            className={`ml-auto relative inline-flex h-8 w-16 items-center rounded-full border transition-colors duration-300 ${theme === 'dark' ? 'bg-primaryBlueColor border-grayBorderColor' : 'bg-white border-grayBorderColor'}`}
+          >
+            <span
+              className={`absolute left-1 h-6 w-6 rounded-full bg-white shadow flex items-center justify-center transition-transform duration-300 ${theme === 'dark' ? 'translate-x-0' : 'translate-x-8'}`}
+            >
+              {theme === 'dark' ? (
+                <svg className="h-3.5 w-3.5 text-greyColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21.752 15.002A9.718 9.718 0 0112 21.75 9.75 9.75 0 1012 2.25c.316 0 .63.017.94.05a.75.75 0 01.3 1.376 7.501 7.501 0 108.512 10.827z" />
+                </svg>
+              ) : (
+                <svg className="h-3.5 w-3.5 text-greyColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 18a6 6 0 100-12 6 6 0 000 12z" />
+                  <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zm0 15a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V18a.75.75 0 01.75-.75zM4.72 4.72a.75.75 0 011.06 0l1.06 1.06a.75.75 0 11-1.06 1.06L4.72 5.78a.75.75 0 010-1.06zm12.38 12.38a.75.75 0 011.06 0l1.06 1.06a.75.75 0 11-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zM2.25 12a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zm15 0a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM4.72 19.28a.75.75 0 010-1.06l1.06-1.06a.75.75 0 111.06 1.06L5.78 19.28a.75.75 0 01-1.06 0zm12.38-12.38a.75.75 0 010-1.06L18.16 4.78a.75.75 0 111.06 1.06l-1.06 1.06a.75.75 0 01-1.06-1.06z" clipRule="evenodd" />
+                </svg>
+              )}
+            </span>
+          </button>
         </div>
       </div>
       {isMenuOpen && (
