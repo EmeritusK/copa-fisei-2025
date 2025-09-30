@@ -43,8 +43,8 @@ const DateButton = styled.button`
     border: 1px solid var(--grayBorderColor);
     border-radius: 5px;
     &:hover {
-        background-color: var(--blueButtonColor);
-        color: var(--whiteColor);
+        background-color: var(--primaryBlueHoverColor);
+        color: var(--foreground);
     }
 `;
 

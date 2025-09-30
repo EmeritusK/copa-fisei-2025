@@ -6,6 +6,7 @@
   --background: #ffffff;
   --foreground: #171717;
   --primaryBlueColor: #e9ecf7;
+  --primaryBlueHoverColor: #d9e2fb;
   --greyColor: #1f2937;
   --grayBorderColor: #e5e7eb;
   --blueButtonColor: #2563eb;
@@ -17,6 +18,8 @@
   --redColor: #dc2626;
   --lightGoldColor: #fde68a;
   --bgColor: #f8fafc;
+  --headerFrom: #ffffff;
+  --headerTo: #e8eefc;
 }
 
 @theme inline {
@@ -44,6 +47,7 @@
     --background: #040A1A;
     --foreground: #ededed;
     --primaryBlueColor: #161B2E;
+    --primaryBlueHoverColor: #1d233b;
     --greyColor: #f9f9f9;
     --grayBorderColor: #5E6376;
     --blueButtonColor: #0081DC;
@@ -55,6 +59,8 @@
     --redColor: #833824;
     --lightGoldColor: #f9d9a6;
     --bgColor: #040a1a;
+    --headerFrom: #0b1120;
+    --headerTo: #161b2e;
   }
 }
 
@@ -83,6 +89,10 @@ body {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--grayBorderColor) transparent;
+}
+
+.app-header {
+  background: linear-gradient(180deg, var(--headerFrom), var(--headerTo));
 }
 
 /* Slick slider arrows and dots themed */

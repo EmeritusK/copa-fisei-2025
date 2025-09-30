@@ -22,7 +22,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="z-50 justify-start px-2 items-center lg:flex sticky top-0 bg-primaryBlueColor shadow">
+      <div className="z-50 justify-start px-2 items-center lg:flex sticky top-0 app-header shadow">
         <div className="flex py-4 px-1 max-w-7xl justify-between">
           <Image
             priority
