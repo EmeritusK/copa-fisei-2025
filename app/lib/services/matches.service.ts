@@ -15,10 +15,9 @@ export class MatchService {
 
 
             if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            if (!data) throw new NoDataError('No se encontró el partido');
-
-            console.log(data);
-            return data as Match;
+            const payload = (data as Match) ?? { success: true, message: '', data: [] };
+            if (!payload?.data) payload.data = [];
+            return payload as Match;
         } catch (error) {
             console.error('Error fetching matches:', error);
             throw error;

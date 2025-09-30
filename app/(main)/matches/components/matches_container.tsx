@@ -12,14 +12,14 @@ const MatchCard = styled.li`
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #ccc;
+    border: 1px solid var(--grayBorderColor);
     border-radius: 8px;
     padding: 16px;
     margin: 8px;
     width: 300px;
     height: 200px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background-color: var(--primaryBlueColor);
 `;
 
 const TeamRow = styled.div`
@@ -36,12 +36,12 @@ const TeamAcronym = styled.div`
 
 const MatchInfo = styled.div`
     font-size: 14px;
-    color: #555;
+    color: var(--greyColor);
 `;
 
 const MatchStatus = styled.div<{ $finalizado?: boolean }>`
     font-size: 14px;
-    color: ${props => (props.$finalizado ? 'red' : '#555')};
+    color: ${props => (props.$finalizado ? 'var(--redColor)' : 'var(--greyColor)')};
     font-weight: bold;
 `;
 

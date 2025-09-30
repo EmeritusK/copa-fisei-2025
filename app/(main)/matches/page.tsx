@@ -14,7 +14,7 @@ const FilterContainer = styled.div`
 const Title = styled.h1`
     text-align: center;
     font-size: 2.5em;
-    color: #333;
+    color: var(--foreground);
     margin-bottom: 20px;
 `;
 
@@ -24,7 +24,7 @@ const FilterLabel = styled.label`
     flex-direction: column;
     align-items: center;
     font-size: 1em;
-    color: #555;
+    color: var(--greyColor);
 `;
 
 const DateNavigation = styled.div`
@@ -38,11 +38,13 @@ const DateButton = styled.button`
     padding: 10px 15px;
     font-size: 1em;
     cursor: pointer;
-    background-color: #f0f0f0;
-    border: none;
+    background-color: var(--primaryBlueColor);
+    color: var(--foreground);
+    border: 1px solid var(--grayBorderColor);
     border-radius: 5px;
     &:hover {
-        background-color: #ddd;
+        background-color: var(--primaryBlueHoverColor);
+        color: var(--foreground);
     }
 `;
 

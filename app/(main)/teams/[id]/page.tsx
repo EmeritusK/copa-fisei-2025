@@ -12,30 +12,34 @@ import { TeamMainInfo } from "@/app/lib/types/team.interface";
 
 export default function Page() {
     const [image, setImage] = useState('');
-    const[playersData, setPlayersData] = useState<Player[]>([]);
-    const[team, setTeam] = useState<TeamMainInfo | null>(null);
+    const [playersData, setPlayersData] = useState<Player[]>([]);
+    const [team, setTeam] = useState<TeamMainInfo | null>(null);
+    const [teamId, setTeamId] = useState<string>('');
     const pathname = usePathname();
-    const id = pathname.substring(pathname.lastIndexOf('=') + 1);
 
 
     useEffect(() => {
+        const parsedId = pathname.substring(pathname.lastIndexOf('=') + 1);
+        setTeamId(parsedId);
+    }, [pathname]);
+
+    useEffect(() => {
+        if (!teamId) return;
         async function getTeamById() {
-            const team = await TeamService.getTeamById({ teamId: id });
-            if (team) {
-                setTeam(team);
-            }
+            const t = await TeamService.getTeamById({ teamId });
+            if (t) setTeam(t);
         }
         async function getTeamImageUrl() {
-            setImage(await TeamService.getTeamLogoUrl({ teamId: id }));
+            setImage(await TeamService.getTeamLogoUrl({ teamId }));
         }
         async function getPlayersByTeamId() {
-            setPlayersData(await PlayerService.getPlayersByTeamId({ teamId: id }));
+            setPlayersData(await PlayerService.getPlayersByTeamId({ teamId }));
         }
 
         getTeamById();
         getPlayersByTeamId();
         getTeamImageUrl();
-    }, [id]);
+    }, [teamId]);
 
 
 
@@ -49,7 +53,7 @@ export default function Page() {
                             <Image
                                 src={image}
                                 width={100}
-                                height={0}
+                                height={100}
                                 alt="Logo del equipo"
                                 className="w-full h-full"
                             />

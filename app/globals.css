@@ -5,6 +5,21 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primaryBlueColor: #e9ecf7;
+  --primaryBlueHoverColor: #d9e2fb;
+  --greyColor: #1f2937;
+  --grayBorderColor: #e5e7eb;
+  --blueButtonColor: #2563eb;
+  --greenColor: #16a34a;
+  --whiteColor: #111827;
+  --secondaryGreenColor: #a7f3d0;
+  --darkGreenColor: #065f46;
+  --goldColor: #ca8a04;
+  --redColor: #dc2626;
+  --lightGoldColor: #fde68a;
+  --bgColor: #f8fafc;
+  --headerFrom: #ffffff;
+  --headerTo: #e8eefc;
 }
 
 @theme inline {
@@ -27,11 +42,11 @@
   --color-foreground: var(--foreground);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+html[data-theme="dark"] {
     --background: #040A1A;
     --foreground: #ededed;
     --primaryBlueColor: #161B2E;
+    --primaryBlueHoverColor: #1d233b;
     --greyColor: #f9f9f9;
     --grayBorderColor: #5E6376;
     --blueButtonColor: #0081DC;
@@ -43,7 +58,8 @@
     --redColor: #833824;
     --lightGoldColor: #f9d9a6;
     --bgColor: #040a1a;
-  }
+    --headerFrom: #0b1120;
+    --headerTo: #161b2e;
 }
 
 body {
@@ -71,4 +87,38 @@ body {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--grayBorderColor) transparent;
+}
+
+.app-header {
+  background: linear-gradient(180deg, var(--headerFrom), var(--headerTo));
+}
+
+/* Slick slider arrows and dots themed */
+.slick-prev:before,
+.slick-next:before {
+  color: var(--foreground) !important;
+}
+.slick-slider {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .slick-slider {
+    padding: 0 8px;
+  }
+  .slick-list {
+    overflow: visible;
+  }
+  .slick-dots {
+    bottom: -18px;
+  }
+}
+
+.slick-dots li button:before {
+  color: var(--greyColor) !important;
+  opacity: 0.5 !important;
+}
+.slick-dots li.slick-active button:before {
+  color: var(--blueButtonColor) !important;
+  opacity: 1 !important;
 }
