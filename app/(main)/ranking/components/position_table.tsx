@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from "react";
+import Image from 'next/image';
 import { RankingService } from "../../../lib/services/ranking.service";
 import { RankingResponse } from "../../../lib/types/ranking.interface";
 import { TeamService } from "@/app/lib/services/teams.service";
@@ -109,9 +110,11 @@ export const TablePosicion = () => {
                                             <td className="px-5 py-2 text-sm border-b border-bgColor">
                                                 <div className="w-10 h-full">
                                                     {teamImages[team.team_id] ? (
-                                                        <img 
+                                                        <Image 
                                                             src={teamImages[team.team_id]} 
                                                             alt={team.team_name} 
+                                                            width={40}
+                                                            height={40}
                                                             className="w-full h-full rounded-full"
                                                         />
                                                     ) : (
@@ -207,9 +210,11 @@ export const TablePosicion = () => {
                                             <td className="px-5 py-2 text-sm border-b border-bgColor">
                                                 <div className="w-10 h-full">
                                                     {teamImagesB[team.team_id] ? (
-                                                        <img 
-                                                            src={teamImagesB[team.team_id]} 
-                                                            alt={team.team_name} 
+                                                        <Image 
+                                                            src={teamImagesB[team.team_id]}
+                                                            alt={team.team_name}
+                                                            width={40}
+                                                            height={40}
                                                             className="w-full h-full rounded-full"
                                                         />
                                                     ) : (

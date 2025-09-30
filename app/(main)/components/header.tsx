@@ -33,12 +33,8 @@ const Header = () => {
   console.log(pathname);
   const style =
     'text-md font-medium transition-colors text-greyColor hover:border-b-2 hover:border-greyColor pb-1';
-  const styleMobile =
-    'text-xl font-light transition-colors text-greyColor py-4 text-center';
   const isSelectedStyle =
     'text-sm font-bold transition-colors text-greyColor hover:border-b-2 hover:border-greyColor pb-1 border-b-2 border-greyColor';
-  const isSelectedMobileStyle =
-    'text-xl font-bold transition-colors text-greyColor pb-1 border-greyColor py-4 text-center';
 
   return (
     <>
