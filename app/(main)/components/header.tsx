@@ -8,21 +8,21 @@ import espnIcon from '../../assets/svg/FISEI.svg';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window === 'undefined') return 'light';
-    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (stored) return stored;
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDark ? 'dark' : 'light';
-  });
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      const html = document.documentElement;
-      if (theme === 'dark') html.setAttribute('data-theme', 'dark');
-      else html.removeAttribute('data-theme');
-      localStorage.setItem('theme', theme);
-    }
+    if (typeof window === 'undefined') return;
+    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const initial = stored ?? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(initial);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const html = document.documentElement;
+    if (theme === 'dark') html.setAttribute('data-theme', 'dark');
+    else html.removeAttribute('data-theme');
+    if (typeof window !== 'undefined') localStorage.setItem('theme', theme);
   }, [theme]);
 
   function toggleTheme() {
