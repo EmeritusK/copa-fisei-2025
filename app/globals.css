@@ -5,6 +5,18 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primaryBlueColor: #e9ecf7;
+  --greyColor: #1f2937;
+  --grayBorderColor: #e5e7eb;
+  --blueButtonColor: #2563eb;
+  --greenColor: #16a34a;
+  --whiteColor: #111827;
+  --secondaryGreenColor: #a7f3d0;
+  --darkGreenColor: #065f46;
+  --goldColor: #ca8a04;
+  --redColor: #dc2626;
+  --lightGoldColor: #fde68a;
+  --bgColor: #f8fafc;
 }
 
 @theme inline {
