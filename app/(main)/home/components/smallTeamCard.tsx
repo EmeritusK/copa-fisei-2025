@@ -12,7 +12,7 @@ function SmallTeamCard({ team }: { team: TeamMainInfo }) {
     const router = useRouter();
 
     async function openSinglePage() {
-        router.push(`/equipos/${name}=${id}`);
+        router.push(`/teams/${name}=${id}`);
     }
 
     useEffect(() => {
