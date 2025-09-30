@@ -7,7 +7,7 @@ function Page() {
     return (
         
             <div className='my-12'>
-                <h1 className="text-4xl font-roboto font-bold text-center text-white mt-10">CLASIFICACION</h1>
+                <h1 className="text-4xl font-roboto font-bold text-center text-foreground mt-10">CLASIFICACION</h1>
 
                 <TablePosicion ></TablePosicion>
                 

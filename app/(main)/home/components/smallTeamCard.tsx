@@ -12,7 +12,7 @@ function SmallTeamCard({ team }: { team: TeamMainInfo }) {
     const router = useRouter();
 
     async function openSinglePage() {
-        router.push(`/equipos/${name}=${id}`);
+        router.push(`/teams/${name}=${id}`);
     }
 
     useEffect(() => {
@@ -29,7 +29,7 @@ function SmallTeamCard({ team }: { team: TeamMainInfo }) {
 
     return <>
         <div className="my-2">
-            <div onClick={openSinglePage} className="cursor-pointer hover:cursor-pointer bg-gray-900 h-24 w-20 grid grid-rows-2 gap-0 justify-center items-center rounded-lg">
+            <div onClick={openSinglePage} className="cursor-pointer hover:cursor-pointer bg-primaryBlueColor h-24 w-20 grid grid-rows-2 gap-0 justify-center items-center rounded-lg">
                 <div className="mt-4 w-12 h-12">
                     {image ? ( // Verifica si hay una imagen disponible
                         <Image src={image} alt="Imagen"

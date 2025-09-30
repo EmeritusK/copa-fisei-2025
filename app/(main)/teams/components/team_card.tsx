@@ -13,6 +13,7 @@ export default function TeamCard({ team }: { team: TeamMainInfo }) {
 
     useEffect(() => {
         getTeamLogoUrl();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     async function getTeamLogoUrl() {

@@ -18,9 +18,8 @@ export class PlayerService {
                 .order('name', { ascending: true });
 
             if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            if (!data?.length) throw new NoDataError('No existen jugadores registrados');
-
-            return data as Player[];
+            const rows = Array.isArray(data) ? data : [];
+            return rows as Player[];
         } catch (error) {
             console.error('Error fetching players:', error);
             throw error;
@@ -37,9 +36,8 @@ export class PlayerService {
                 .order('name', { ascending: true });
 
             if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            if (!data?.length) throw new NoDataError('No existen jugadores registrados');
-
-            return data as Player[];
+            const rows = Array.isArray(data) ? data : [];
+            return rows as Player[];
         } catch (error) {
             console.error('Error fetching players:', error);
             throw error;

@@ -37,9 +37,8 @@ export class TeamService {
                 .order('name', { ascending: true });
 
             if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            if (!data?.length) throw new NoDataError('No existen equipos registrados');
-
-            return data as TeamMainInfo[];
+            const rows = Array.isArray(data) ? data : [];
+            return rows as TeamMainInfo[];
         } catch (error) {
             console.error('Error fetching teams:', error);
             throw error;
