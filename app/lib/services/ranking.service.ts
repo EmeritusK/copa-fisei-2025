@@ -62,10 +62,7 @@ export async function getStandings(): Promise<RankingResponse> {
             return team;
         });
 
-        const groups: Data = {
-            A: [],
-            B: []
-        };
+        const groups: Data = {};
 
         const sortGroup = (a: Group, b: Group) => {
             if (b.points !== a.points) return b.points - a.points;
@@ -73,8 +70,16 @@ export async function getStandings(): Promise<RankingResponse> {
             return b.goals_for - a.goals_for;
         };
         
-        groups.A = sortedTeams.filter(t => t.group === 'A').sort(sortGroup).map((t, i) => ({ ...t, position: i + 1 }));
-        groups.B = sortedTeams.filter(t => t.group === 'B').sort(sortGroup).map((t, i) => ({ ...t, position: i + 1 }));
+        const uniqueGroups = Array.from(
+            new Set(sortedTeams.map((team) => team.group))
+        ).sort();
+
+        for (const groupName of uniqueGroups) {
+            groups[groupName] = sortedTeams
+                .filter((team) => team.group === groupName)
+                .sort(sortGroup)
+                .map((team, index) => ({ ...team, position: index + 1 }));
+        }
 
         return {
             success: true,
