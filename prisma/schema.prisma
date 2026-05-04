@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id             String   @id @default(uuid())
+  name           String
+  acronym        String
+  career_acronym String
+  group          String   @default("A")
+  players        Player[]
+  homeMatches    Match[]  @relation("HomeMatches")
+  awayMatches    Match[]  @relation("AwayMatches")
+}
+
+model Player {
+  id            String   @id @default(uuid())
+  national_id   String
+  team_id       String
+  name          String
+  date_of_birth String
+  jersey_number Int
+  status        String
+  career        String
+  career_level  String
+  position      String
+  created_at    DateTime @default(now())
+  team          Team     @relation(fields: [team_id], references: [id])
+}
+
+model Match {
+  id              String   @id @default(uuid())
+  date            DateTime
+  time            String
+  home_team_id    String
+  away_team_id    String
+  home_team_goals Int      @default(0)
+  away_team_goals Int      @default(0)
+  status          String
+  homeTeam        Team     @relation("HomeMatches", fields: [home_team_id], references: [id])
+  awayTeam        Team     @relation("AwayMatches", fields: [away_team_id], references: [id])
+}

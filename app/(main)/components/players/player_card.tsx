@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Image from 'next/image';
 import { Player } from "@/app/lib/types/player.interface";
-import { PlayerService } from "@/app/lib/services/players.service";
+import { getPlayerImageUrl } from '@/app/lib/services/players.service';
 import { FaBook } from "react-icons/fa";
 
 export default function PlayerCard({ player }: { player: Player }) {
@@ -11,10 +11,10 @@ export default function PlayerCard({ player }: { player: Player }) {
 
 
     useEffect(() => {
-        async function getPlayerImageUrl() {
-            setImage(await PlayerService.getPlayerImageUrl({ playerId: player.id }));
+        async function fetchImage() {
+            setImage(await getPlayerImageUrl({ playerId: player.id }));
         }
-        getPlayerImageUrl();
+        fetchImage();
     }, [player.id]);
 
 

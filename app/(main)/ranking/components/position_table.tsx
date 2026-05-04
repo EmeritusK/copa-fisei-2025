@@ -1,9 +1,9 @@
 'use client'
 import React, { useState, useEffect } from "react";
 import Image from 'next/image';
-import { RankingService } from "../../../lib/services/ranking.service";
+import { getStandings } from '../../../lib/services/ranking.service';
 import { RankingResponse } from "../../../lib/types/ranking.interface";
-import { TeamService } from "@/app/lib/services/teams.service";
+import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
 import { useRouter } from "next/navigation";
 
 export const TablePosicion = () => {
@@ -15,17 +15,17 @@ export const TablePosicion = () => {
     useEffect(() => {
         const fetchRanking = async () => {
             try {
-                const ranking = await RankingService.getStandings();
+                const ranking = await getStandings();
                 setPositions(ranking);
 
                 // Fetch images for all teams in group A
                 const imagePromises = ranking.data.A.map(async (team) => {
-                    const imageUrl = await TeamService.getTeamLogoUrl({ teamId: team.team_id });
+                    const imageUrl = await getTeamLogoUrl({ teamId: team.team_id });
                     return { teamId: team.team_id, imageUrl };
                 });
 
                 const imagePromisesB = ranking.data.B.map(async (team) => {
-                    const imageUrl = await TeamService.getTeamLogoUrl({ teamId: team.team_id });
+                    const imageUrl = await getTeamLogoUrl({ teamId: team.team_id });
                     return { teamId: team.team_id, imageUrl };
                 });
 

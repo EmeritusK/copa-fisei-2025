@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation'
 import PlayerCard from "../../components/players/player_card";
 import { Player } from "@/app/lib/types/player.interface";
-import { TeamService } from "@/app/lib/services/teams.service";
-import { PlayerService } from "@/app/lib/services/players.service";
+import { getTeamById, getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { getPlayersByTeamId } from '@/app/lib/services/players.service';
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
 
 
@@ -14,31 +14,25 @@ export default function Page() {
     const [image, setImage] = useState('');
     const [playersData, setPlayersData] = useState<Player[]>([]);
     const [team, setTeam] = useState<TeamMainInfo | null>(null);
-    const [teamId, setTeamId] = useState<string>('');
     const pathname = usePathname();
-
-
-    useEffect(() => {
-        const parsedId = pathname.substring(pathname.lastIndexOf('=') + 1);
-        setTeamId(parsedId);
-    }, [pathname]);
+    const teamId = pathname.substring(pathname.lastIndexOf('=') + 1);
 
     useEffect(() => {
         if (!teamId) return;
-        async function getTeamById() {
-            const t = await TeamService.getTeamById({ teamId });
+        async function fetchTeam() {
+            const t = await getTeamById({ teamId });
             if (t) setTeam(t);
         }
-        async function getTeamImageUrl() {
-            setImage(await TeamService.getTeamLogoUrl({ teamId }));
+        async function fetchImage() {
+            setImage(await getTeamLogoUrl({ teamId }));
         }
-        async function getPlayersByTeamId() {
-            setPlayersData(await PlayerService.getPlayersByTeamId({ teamId }));
+        async function fetchPlayers() {
+            setPlayersData(await getPlayersByTeamId({ teamId }));
         }
 
-        getTeamById();
-        getPlayersByTeamId();
-        getTeamImageUrl();
+        fetchTeam();
+        fetchPlayers();
+        fetchImage();
     }, [teamId]);
 
 

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import TeamLogo from '../../../assets/default_team_logo.png';
 import { useRouter } from 'next/navigation'
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
-import { TeamService } from "@/app/lib/services/teams.service";
+import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
 
 function SmallTeamCard({ team }: { team: TeamMainInfo }) {
     const { id, name, acronym } = team; // Recibiendo las props id y abreviatura
@@ -17,7 +17,7 @@ function SmallTeamCard({ team }: { team: TeamMainInfo }) {
 
     useEffect(() => {
         async function getTeamPicture() {
-            const imageUrl = await TeamService.getTeamLogoUrl({ teamId: id });
+            const imageUrl = await getTeamLogoUrl({ teamId: id });
             setImage(imageUrl);
         }
         getTeamPicture();

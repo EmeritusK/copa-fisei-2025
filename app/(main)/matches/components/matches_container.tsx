@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MatchData } from '../../../lib/types/matches.interface';
 import styled from 'styled-components';
-import { TeamService } from "@/app/lib/services/teams.service";
+import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
 
 interface MatchesContainerProps {
     matches: MatchData[];
@@ -60,12 +60,12 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
         const fetchRanking = async () => {
             try {
                 const imagePromises = matches.map(async (team) => {
-                    const imageUrl = await TeamService.getTeamLogoUrl({ teamId: team.home_team.home_team_id });
+                    const imageUrl = await getTeamLogoUrl({ teamId: team.home_team.home_team_id });
                     return { teamId: team.home_team.home_team_id, imageUrl };
                 });
 
                 const imagePromisesB = matches.map(async (team) => {
-                    const imageUrl = await TeamService.getTeamLogoUrl({ teamId: team.away_team.away_team_id });
+                    const imageUrl = await getTeamLogoUrl({ teamId: team.away_team.away_team_id });
                     return { teamId: team.away_team.away_team_id, imageUrl };
                 });
 

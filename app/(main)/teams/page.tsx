@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import TeamCard from "./components/team_card";
-import { TeamService } from "@/app/lib/services/teams.service";
+import { getTeams } from '@/app/lib/services/teams.service';
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
 
 export default function Page() {
@@ -12,7 +12,7 @@ export default function Page() {
     useEffect(() => {
         const fetchEquipos = async () => {
             try {
-                const teamsData = await TeamService.getTeams();
+                const teamsData = await getTeams();
                 if (teamsData) {
                     setTeams(teamsData);
                 }
