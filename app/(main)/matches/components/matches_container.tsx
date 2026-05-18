@@ -1,10 +1,79 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+
+import React, { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { MatchData } from '../../../lib/types/matches.interface';
 import styled from 'styled-components';
 import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { teamLogoImageStyle } from '@/app/lib/teamLogoDisplay';
+import { GiWhistle } from 'react-icons/gi';
+import { MdOutlineLiveTv } from 'react-icons/md';
 
 interface MatchesContainerProps {
     matches: MatchData[];
+}
+
+function localDateKey(iso: Date | string): string {
+    const d = new Date(iso);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function dayHeaderParts(iso: Date | string): { weekday: string; dateLine: string } {
+    const d = new Date(iso);
+    const weekday = d
+        .toLocaleDateString('es-EC', { weekday: 'long' })
+        .toUpperCase();
+    const dateLine = d
+        .toLocaleDateString('es-EC', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+        })
+        .replace(/\.$/, '');
+    return { weekday, dateLine };
+}
+
+function isFinished(status: string): boolean {
+    const s = status.toUpperCase();
+    return s === 'FINALIZADO' || s === 'FINISHED' || s === 'FT';
+}
+
+function groupMatchesByCalendarDay(list: MatchData[]): { key: string; firstDate: Date; items: MatchData[] }[] {
+    const sorted = [...list].sort((a, b) => {
+        const ta = new Date(`${a.date}T${a.time}`).getTime();
+        const tb = new Date(`${b.date}T${b.time}`).getTime();
+        return ta - tb;
+    });
+    const groups: { key: string; firstDate: Date; items: MatchData[] }[] = [];
+    let currentKey = '';
+    let bucket: MatchData[] = [];
+    for (const m of sorted) {
+        const key = localDateKey(m.date);
+        if (key !== currentKey) {
+            if (bucket.length) {
+                groups.push({
+                    key: currentKey,
+                    firstDate: new Date(bucket[0].date),
+                    items: bucket,
+                });
+            }
+            currentKey = key;
+            bucket = [m];
+        } else {
+            bucket.push(m);
+        }
+    }
+    if (bucket.length) {
+        groups.push({
+            key: currentKey,
+            firstDate: new Date(bucket[0].date),
+            items: bucket,
+        });
+    }
+    return groups;
 }
 
 const MatchCard = styled.li`
@@ -41,7 +110,7 @@ const MatchInfo = styled.div`
 
 const MatchStatus = styled.div<{ $finalizado?: boolean }>`
     font-size: 14px;
-    color: ${props => (props.$finalizado ? 'var(--redColor)' : 'var(--greyColor)')};
+    color: ${(props) => (props.$finalizado ? 'var(--redColor)' : 'var(--greyColor)')};
     font-weight: bold;
 `;
 
@@ -49,79 +118,183 @@ const TeamLogo = styled.img`
     width: 40px;
     height: 40px;
     margin-bottom: 8px;
+    object-fit: contain;
 `;
 
 const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
-
-    const [teamImages, setTeamImages] = useState<{[key: string]: string}>({});
-    const [teamImagesB, setTeamImagesB] = useState<{[key: string]: string}>({});
+    const [teamImages, setTeamImages] = useState<Record<string, string>>({});
 
     useEffect(() => {
-        const fetchRanking = async () => {
+        let cancelled = false;
+        (async () => {
             try {
-                const imagePromises = matches.map(async (team) => {
-                    const imageUrl = await getTeamLogoUrl({ teamId: team.home_team.home_team_id });
-                    return { teamId: team.home_team.home_team_id, imageUrl };
-                });
-
-                const imagePromisesB = matches.map(async (team) => {
-                    const imageUrl = await getTeamLogoUrl({ teamId: team.away_team.away_team_id });
-                    return { teamId: team.away_team.away_team_id, imageUrl };
-                });
-
-                const images = await Promise.all(imagePromises);
-                const imageMap = images.reduce((acc, { teamId, imageUrl }) => {
-                    acc[teamId] = imageUrl;
-                    return acc;
-                }, {} as {[key: string]: string});
-
-                const imagesB = await Promise.all(imagePromisesB);
-                const imageMapB = imagesB.reduce((acc, { teamId, imageUrl }) => {
-                    acc[teamId] = imageUrl;
-                    return acc;
-                }, {} as {[key: string]: string});
-
-                setTeamImages(imageMap);
-                setTeamImagesB(imageMapB);
-
-            } catch (error) {
-                console.error('Error fetching ranking data:', error);
+                const ids = new Set<string>();
+                for (const m of matches) {
+                    ids.add(m.home_team.home_team_id);
+                    ids.add(m.away_team.away_team_id);
+                }
+                const entries = await Promise.all(
+                    Array.from(ids).map(async (teamId) => {
+                        const imageUrl = await getTeamLogoUrl({ teamId });
+                        return [teamId, imageUrl] as const;
+                    })
+                );
+                if (cancelled) return;
+                setTeamImages(Object.fromEntries(entries));
+            } catch (e) {
+                console.error('Error loading team logos:', e);
             }
+        })();
+        return () => {
+            cancelled = true;
         };
-
-        fetchRanking();
     }, [matches]);
 
+    const dayGroups = useMemo(() => groupMatchesByCalendarDay(matches), [matches]);
+
+    if (matches.length === 0) {
+        return (
+            <p className="text-center text-greyColor py-12 text-sm">
+                No hay partidos para mostrar.
+            </p>
+        );
+    }
+
     return (
-        <ul style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {matches.map(match => (
-                <MatchCard key={match.match_id}>
-                    {match.status === 'FINALIZADO' ? (
-                        <MatchStatus $finalizado={true}>{`Finalizado: ${match.home_team.home_team_goals} - ${match.away_team.away_team_goals}`}</MatchStatus>
-                    ) : (
-                        <MatchStatus>Programado</MatchStatus>
-                    )}
-                    <TeamRow>
-                        <div style={{ textAlign: 'center' }}>
-                            <TeamLogo src={teamImages[match.home_team.home_team_id]} alt={match.home_team.home_team_name} />
-                            <TeamAcronym>{match.home_team.home_team_acronym}</TeamAcronym>
-                        </div>
-                        <div>vs</div>
-                        <div style={{ textAlign: 'center' }}>
-                            <TeamLogo src={teamImagesB[match.away_team.away_team_id]} alt={match.away_team.away_team_name} />
-                            <TeamAcronym>{match.away_team.away_team_acronym}</TeamAcronym>
-                        </div>
-                    </TeamRow>
-                    <MatchInfo>
-                        {(() => {
-                            const date = new Date(match.date);
-                            date.setDate(date.getDate() + 1);
-                            return date.toLocaleDateString();
-                        })()} {match.time}
-                    </MatchInfo>
-                </MatchCard>
-            ))}
-        </ul>
+        <div className="w-full max-w-5xl mx-auto px-3 sm:px-4">
+            {/* Desktop: list by day */}
+            <div className="hidden md:block">
+                {dayGroups.map((group) => {
+                    const { weekday, dateLine } = dayHeaderParts(group.firstDate);
+                    return (
+                        <section key={group.key} className="mb-10">
+                            <header className="flex items-baseline justify-between gap-4 pb-4 pt-2 border-b border-grayBorderColor">
+                                <h2 className="text-lg font-bold tracking-wide text-foreground">
+                                    {weekday}
+                                </h2>
+                                <p className="text-sm text-greyColor shrink-0">{dateLine}</p>
+                            </header>
+                            <ul className="mt-2 flex flex-col gap-1">
+                                {group.items.map((match) => {
+                                    const finished = isFinished(match.status);
+                                    const homeImg = teamImages[match.home_team.home_team_id];
+                                    const awayImg = teamImages[match.away_team.away_team_id];
+                                    const homeAbbr = match.home_team.home_team_acronym.toUpperCase();
+                                    const awayAbbr = match.away_team.away_team_acronym.toUpperCase();
+                                    const homeScore = finished
+                                        ? String(match.home_team.home_team_goals)
+                                        : '—';
+                                    const awayScore = finished
+                                        ? String(match.away_team.away_team_goals)
+                                        : '—';
+                                    return (
+                                        <li
+                                            key={match.match_id}
+                                            className="flex items-stretch gap-2 rounded-md bg-primaryBlueColor border border-grayBorderColor px-3 py-3 min-h-[4.5rem]"
+                                        >
+                                            <div className="flex w-9 shrink-0 items-center justify-center text-greyColor">
+                                                <GiWhistle className="h-5 w-5" aria-hidden />
+                                            </div>
+                                            <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
+                                                <span className="truncate text-right text-sm font-semibold text-foreground">
+                                                    {match.home_team.home_team_name}
+                                                </span>
+                                                {homeImg ? (
+                                                    <Image
+                                                        src={homeImg}
+                                                        alt={match.home_team.home_team_name}
+                                                        width={40}
+                                                        height={40}
+                                                        className="h-10 w-10 shrink-0 object-contain"
+                                                        style={teamLogoImageStyle(match.home_team.home_team_name)}
+                                                        unoptimized
+                                                    />
+                                                ) : null}
+                                            </div>
+                                            <div className="flex shrink-0 items-center gap-0.5">
+                                                <div className="flex h-[4.25rem] w-[3.25rem] flex-col items-center justify-between rounded border border-grayBorderColor bg-[#0a1020] px-1 py-1.5">
+                                                    <span className="text-[0.65rem] font-semibold uppercase tracking-tight text-greyColor">
+                                                        {homeAbbr}
+                                                    </span>
+                                                    <span className="text-xl font-bold leading-none text-foreground">
+                                                        {homeScore}
+                                                    </span>
+                                                </div>
+                                                <div className="flex h-[4.25rem] w-[3.25rem] flex-col items-center justify-between rounded border border-grayBorderColor bg-[#0a1020] px-1 py-1.5">
+                                                    <span className="text-[0.65rem] font-semibold uppercase tracking-tight text-greyColor">
+                                                        {awayAbbr}
+                                                    </span>
+                                                    <span className="text-xl font-bold leading-none text-foreground">
+                                                        {awayScore}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="flex min-w-0 flex-1 items-center justify-start gap-3">
+                                                {awayImg ? (
+                                                    <Image
+                                                        src={awayImg}
+                                                        alt={match.away_team.away_team_name}
+                                                        width={40}
+                                                        height={40}
+                                                        className="h-10 w-10 shrink-0 object-contain"
+                                                        style={teamLogoImageStyle(match.away_team.away_team_name)}
+                                                        unoptimized
+                                                    />
+                                                ) : null}
+                                                <span className="truncate text-left text-sm font-semibold text-foreground">
+                                                    {match.away_team.away_team_name}
+                                                </span>
+                                            </div>
+                                            <div className="flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 text-greyColor">
+                                                <MdOutlineLiveTv className="h-5 w-5" aria-hidden />
+                                                <span className="text-[0.65rem] leading-tight text-center">
+                                                    {finished ? 'Resultado' : 'Programado'}
+                                                </span>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </section>
+                    );
+                })}
+            </div>
+
+            {/* Mobile: cards */}
+            <ul className="flex flex-wrap justify-center md:hidden">
+                {matches.map((match) => (
+                    <MatchCard key={match.match_id}>
+                        {isFinished(match.status) ? (
+                            <MatchStatus $finalizado={true}>{`Finalizado: ${match.home_team.home_team_goals} - ${match.away_team.away_team_goals}`}</MatchStatus>
+                        ) : (
+                            <MatchStatus>Programado</MatchStatus>
+                        )}
+                        <TeamRow>
+                            <div style={{ textAlign: 'center' }}>
+                                <TeamLogo
+                                    src={teamImages[match.home_team.home_team_id]}
+                                    alt={match.home_team.home_team_name}
+                                    style={teamLogoImageStyle(match.home_team.home_team_name)}
+                                />
+                                <TeamAcronym>{match.home_team.home_team_acronym}</TeamAcronym>
+                            </div>
+                            <div>vs</div>
+                            <div style={{ textAlign: 'center' }}>
+                                <TeamLogo
+                                    src={teamImages[match.away_team.away_team_id]}
+                                    alt={match.away_team.away_team_name}
+                                    style={teamLogoImageStyle(match.away_team.away_team_name)}
+                                />
+                                <TeamAcronym>{match.away_team.away_team_acronym}</TeamAcronym>
+                            </div>
+                        </TeamRow>
+                        <MatchInfo>
+                            {new Date(match.date).toLocaleDateString('es-EC')} {match.time}
+                        </MatchInfo>
+                    </MatchCard>
+                ))}
+            </ul>
+        </div>
     );
 };
 

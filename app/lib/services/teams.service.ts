@@ -2,7 +2,7 @@
 import { DatabaseError, NoDataError } from '../errors/database.errors';
 import { TeamMainInfo } from '../types/team.interface';
 import { prisma } from '../prisma';
-const defaultImage = "https://mqsikcvonyfulmbpyvts.supabase.co/storage/v1/object/public/team-logos//default.svg";
+import { resolveTeamLogoPath } from '../teamLocalLogos';
 
 function getErrorMessage(error: unknown): string {
     return error instanceof Error ? error.message : 'Unknown error';
@@ -49,8 +49,14 @@ export async function getTeams(): Promise<TeamMainInfo[]> {
 
 export async function getTeamLogoUrl({ teamId }: { teamId: string }): Promise<string> {
     try {
-        return `https://mqsikcvonyfulmbpyvts.supabase.co/storage/v1/object/public/team-logos/${teamId}.svg`;
+        const team = await prisma.team.findUnique({
+            where: { id: teamId },
+            select: { name: true },
+        });
+        if (!team) return resolveTeamLogoPath('');
+
+        return resolveTeamLogoPath(team.name);
     } catch {
-        return defaultImage;
+        return resolveTeamLogoPath('');
     }
 }

@@ -1,14 +1,13 @@
 'use client'
 import React, { useState, useEffect } from "react";
-import Image from 'next/image';
 import { getStandings } from '../../../lib/services/ranking.service';
 import { RankingResponse } from "../../../lib/types/ranking.interface";
-import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { resolveTeamLogoPath } from '@/app/lib/teamLocalLogos';
+import { teamLogoImageStyle } from '@/app/lib/teamLogoDisplay';
 import { useRouter } from "next/navigation";
 
 export const TablePosicion = () => {
     const [positions, setPositions] = useState<RankingResponse | null>(null);
-    const [teamImages, setTeamImages] = useState<{[key: string]: string}>({});
     const router = useRouter();
 
     useEffect(() => {
@@ -16,21 +15,6 @@ export const TablePosicion = () => {
             try {
                 const ranking = await getStandings();
                 setPositions(ranking);
-
-                const allTeams = Object.values(ranking.data).flat();
-                const imagePromises = allTeams.map(async (team) => {
-                    const imageUrl = await getTeamLogoUrl({ teamId: team.team_id });
-                    return { teamId: team.team_id, imageUrl };
-                });
-
-                const images = await Promise.all(imagePromises);
-                const imageMap = images.reduce((acc, { teamId, imageUrl }) => {
-                    acc[teamId] = imageUrl;
-                    return acc;
-                }, {} as {[key: string]: string});
-
-                setTeamImages(imageMap);
-
             } catch (error) {
                 console.error('Error fetching ranking data:', error);
             }
@@ -79,19 +63,14 @@ export const TablePosicion = () => {
                                                     <p className="text-greyColor">{index + 1}</p>
                                                 </td>
                                                 <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                    <div className="w-10 h-full">
-                                                        {teamImages[team.team_id] ? (
-                                                            <Image 
-                                                                src={teamImages[team.team_id]}
-                                                                alt={team.team_name}
-                                                                width={40}
-                                                                height={40}
-                                                                className="w-full h-full rounded-full"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full animate-pulse bg-gray-300 rounded-full" />
-                                                        )}
-                                                    </div>
+                                                    <img
+                                                        src={resolveTeamLogoPath(team.team_name)}
+                                                        alt={team.team_name}
+                                                        width={40}
+                                                        height={40}
+                                                        className="block h-10 w-10 object-contain"
+                                                        style={teamLogoImageStyle(team.team_name)}
+                                                    />
                                                 </td>
                                                 <td className="px-5 py-2 text-sm border-b border-bgColor">
                                                     <p className="text-foreground font-semibold hover:text-greyColor cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})}>{team.team_name}</p>

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import PlayerCard from "../../components/players/player_card";
 import { Player } from "@/app/lib/types/player.interface";
 import { getTeamById, getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { teamLogoImageStyle } from '@/app/lib/teamLogoDisplay';
 import { getPlayersByTeamId } from '@/app/lib/services/players.service';
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
 
@@ -42,17 +43,19 @@ export default function Page() {
     <div className='m-12'>
     <div>
             <div className="bg-primaryBlueColor w-full py-4 px-12 rounded-3xl flex items-center justify-center">
-                    <div className="w-[10%] h-auto relative items-center justify-center">
+                    <div className="w-[10%] h-auto relative flex items-center justify-center overflow-hidden rounded-md aspect-square max-h-[100px]">
                         {image ? (
                             <Image
                                 src={image}
                                 width={100}
                                 height={100}
                                 alt="Logo del equipo"
-                                className="w-full h-full"
+                                className="w-full h-full object-cover"
+                                style={teamLogoImageStyle(team?.name)}
+                                unoptimized
                             />
                         ) : (
-                            <div className="w-full h-full animate-pulse bg-gray-300 rounded-full" />
+                            <div className="w-full h-full animate-pulse bg-gray-300 rounded-md" />
                         )}
                     </div>
                     <div className="w-[5%]"></div>

@@ -33,12 +33,3 @@ export async function getPlayersByTeamId({ teamId }: { teamId: string }): Promis
         throw new DatabaseError(`Database error: ${getErrorMessage(error)}`);
     }
 }
-
-export async function getPlayerImageUrl({ playerId }: { playerId: string }): Promise<string> {
-    try {
-        return `https://mqsikcvonyfulmbpyvts.supabase.co/storage/v1/object/public/players-images/${playerId}.svg`;
-    } catch (error) {
-        console.error('Error getting player image:', error);
-        return '';
-    }
-}
