@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
 import TeamsSlider from "./components/teamSlider";
-import { TeamService } from "@/app/lib/services/teams.service";
+import { getTeams } from '@/app/lib/services/teams.service';
 
 
 export default function Home() {
@@ -18,7 +18,7 @@ export default function Home() {
     useEffect(() => {
         const loadTeams = async () => {
             try {
-                const teamsData = await TeamService.getTeams();
+                const teamsData = await getTeams();
                 console.log(teamsData[0].acronym);
                 if (teamsData) {
                     setTeams(teamsData);

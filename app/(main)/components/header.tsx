@@ -13,7 +13,14 @@ const Header = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const initial = stored ?? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const initial =
+      stored ??
+      (window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light');
+    // Needed to sync user preference after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(initial);
   }, []);
 
@@ -30,7 +37,6 @@ const Header = () => {
   }
 
   const pathname = usePathname();
-  console.log(pathname);
   const style =
     'text-md font-medium transition-colors text-greyColor hover:border-b-2 hover:border-greyColor pb-1';
   const isSelectedStyle =

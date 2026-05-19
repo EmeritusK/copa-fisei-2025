@@ -1,49 +1,20 @@
 'use client'
 import React, { useState, useEffect } from "react";
-import Image from 'next/image';
-import { RankingService } from "../../../lib/services/ranking.service";
+import { getStandings } from '../../../lib/services/ranking.service';
 import { RankingResponse } from "../../../lib/types/ranking.interface";
-import { TeamService } from "@/app/lib/services/teams.service";
+import { resolveTeamLogoPath } from '@/app/lib/teamLocalLogos';
+import { teamLogoImageStyle } from '@/app/lib/teamLogoDisplay';
 import { useRouter } from "next/navigation";
 
 export const TablePosicion = () => {
     const [positions, setPositions] = useState<RankingResponse | null>(null);
-    const [teamImages, setTeamImages] = useState<{[key: string]: string}>({});
-    const [teamImagesB, setTeamImagesB] = useState<{[key: string]: string}>({});
     const router = useRouter();
 
     useEffect(() => {
         const fetchRanking = async () => {
             try {
-                const ranking = await RankingService.getStandings();
+                const ranking = await getStandings();
                 setPositions(ranking);
-
-                // Fetch images for all teams in group A
-                const imagePromises = ranking.data.A.map(async (team) => {
-                    const imageUrl = await TeamService.getTeamLogoUrl({ teamId: team.team_id });
-                    return { teamId: team.team_id, imageUrl };
-                });
-
-                const imagePromisesB = ranking.data.B.map(async (team) => {
-                    const imageUrl = await TeamService.getTeamLogoUrl({ teamId: team.team_id });
-                    return { teamId: team.team_id, imageUrl };
-                });
-
-                const images = await Promise.all(imagePromises);
-                const imageMap = images.reduce((acc, { teamId, imageUrl }) => {
-                    acc[teamId] = imageUrl;
-                    return acc;
-                }, {} as {[key: string]: string});
-
-                const imagesB = await Promise.all(imagePromisesB);
-                const imageMapB = imagesB.reduce((acc, { teamId, imageUrl }) => {
-                    acc[teamId] = imageUrl;
-                    return acc;
-                }, {} as {[key: string]: string});
-
-                setTeamImages(imageMap);
-                setTeamImagesB(imageMapB);
-
             } catch (error) {
                 console.error('Error fetching ranking data:', error);
             }
@@ -56,209 +27,84 @@ export const TablePosicion = () => {
         router.push(`/teams/${teamName}=${teamId}`);
     }
 
+    const groupEntries = Object.entries(positions?.data ?? {});
+
     return (
         <>
             <div className="container   px-4 mx-auto sm:px-8 ">
-                <div className="py-5">
-                    <div className="flex flex-row justify-between  w-full mb-1 sm:mb-0">
-                        <h2 className="text-3xl leading-tight m-2 font-roboto font-bold text-foreground">
-                            GRUPO A
-                        </h2>
-
-                    </div>
-                    <div className="px-4 py-0 -mx-4 overflow-x-auto sm:-mx-8 sm:px-8">
-                        <div className="inline-block min-w-full overflow-hidden rounded-lg ">
-                            <table className="min-w-full leading-normal">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" className=" w-1  text-md font-mono font-semibold text-left  border-b border-bgColor">
-                                        </th>
-                                        <th scope="col" className="  px-5 py-1 w-2 text-md font-mono font-semibold text-left  border-b border-bgColor">
-                                        </th>
-                                        <th scope="col" className="px-5 py-1  text-lg font-mono font-normal  text-left text-gray-400   border-b border-bgColor">
-
-                                        </th>
-                                        <th scope="col" className="px-7 py-1 w-2 text-md font-mono font-semibold text-right text-greyColor   border-b border-bgColor">
-                                            Partidos
-                                        </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">
-                                            V
-                                        </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">
-                                            E
-                                        </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">
-                                            D
-                                        </th>
-                                        <th scope="col" className=" py-1 w-4 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">
-                                            Goles
-                                        </th>
-                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono font-semibold text-center  text-greyColor   border-b border-bgColor">
-                                            +/-
-                                        </th>
-                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono  text-right text-greyColor  border-b border-bgColor">
-                                            Puntos
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody  >
-                                    {positions?.data.A.map((team, index) => (
-                                        <tr key={team.team_id}>
-                                            <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <p className="text-greyColor">{index + 1}</p>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <div className="w-10 h-full">
-                                                    {teamImages[team.team_id] ? (
-                                                        <Image 
-                                                            src={teamImages[team.team_id]} 
-                                                            alt={team.team_name} 
-                                                            width={40}
-                                                            height={40}
-                                                            className="w-full h-full rounded-full"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full animate-pulse bg-gray-300 rounded-full" />
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <p className="text-foreground font-semibold hover:text-greyColor cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})} >{team.team_name}</p>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm border-b border-bgColor text-center">
-                                                <p className="text-greyColor">{team.matches_played}</p>
-                                            </td>
-                                            <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.wins}</p>
-                                            </td>
-                                            <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.draws}</p>
-                                            </td>
-                                            <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.losses}</p>
-                                            </td>
-                                            <td className="px-3 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor min-w-[60px]">{team.goals_for} - {team.goals_against}</p>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.goal_difference}</p>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.points}</p>
-                                            </td>
+                {groupEntries.map(([groupName, teams]) => (
+                    <div className="py-5" key={groupName}>
+                        <div className="flex flex-row justify-between  w-full mb-1 sm:mb-0">
+                            <h2 className="text-3xl leading-tight m-2 font-roboto font-bold text-foreground">
+                                {`GRUPO ${groupName}`}
+                            </h2>
+                        </div>
+                        <div className="px-4 py-0 -mx-4 overflow-x-auto sm:-mx-8 sm:px-8">
+                            <div className="inline-block min-w-full overflow-hidden rounded-lg ">
+                                <table className="min-w-full leading-normal">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" className=" w-1  text-md font-mono font-semibold text-left  border-b border-bgColor"></th>
+                                            <th scope="col" className="  px-5 py-1 w-2 text-md font-mono font-semibold text-left  border-b border-bgColor"></th>
+                                            <th scope="col" className="px-5 py-1  text-lg font-mono font-normal  text-left text-gray-400   border-b border-bgColor"></th>
+                                            <th scope="col" className="px-7 py-1 w-2 text-md font-mono font-semibold text-right text-greyColor   border-b border-bgColor">Partidos</th>
+                                            <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">V</th>
+                                            <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">E</th>
+                                            <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">D</th>
+                                            <th scope="col" className=" py-1 w-4 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">Goles</th>
+                                            <th scope="col" className="px-5 py-1 w-2 text-md font-mono font-semibold text-center  text-greyColor   border-b border-bgColor">+/-</th>
+                                            <th scope="col" className="px-5 py-1 w-2 text-md font-mono  text-right text-greyColor  border-b border-bgColor">Puntos</th>
                                         </tr>
-                                    ))}
-
-
-                                </tbody>
-                            </table>
-                            <div className="flex flex-col items-center px-5 py-5 bg-primaryBlueColor xs:flex-row xs:justify-between border-t border-bgColor">
-
+                                    </thead>
+                                    <tbody>
+                                        {teams.map((team, index) => (
+                                            <tr key={team.team_id}>
+                                                <td className="px-5 py-2 text-sm border-b border-bgColor">
+                                                    <p className="text-greyColor">{index + 1}</p>
+                                                </td>
+                                                <td className="px-5 py-2 text-sm border-b border-bgColor">
+                                                    <img
+                                                        src={resolveTeamLogoPath(team.team_name)}
+                                                        alt={team.team_name}
+                                                        width={40}
+                                                        height={40}
+                                                        className="block h-10 w-10 object-contain"
+                                                        style={teamLogoImageStyle(team.team_name)}
+                                                    />
+                                                </td>
+                                                <td className="px-5 py-2 text-sm border-b border-bgColor">
+                                                    <p className="text-foreground font-semibold hover:text-greyColor cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})}>{team.team_name}</p>
+                                                </td>
+                                                <td className="px-5 py-2 text-sm border-b border-bgColor text-center">
+                                                    <p className="text-greyColor">{team.matches_played}</p>
+                                                </td>
+                                                <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
+                                                    <p className="text-greyColor">{team.wins}</p>
+                                                </td>
+                                                <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
+                                                    <p className="text-greyColor">{team.draws}</p>
+                                                </td>
+                                                <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
+                                                    <p className="text-greyColor">{team.losses}</p>
+                                                </td>
+                                                <td className="px-3 py-2 text-sm text-center border-b border-bgColor">
+                                                    <p className="text-greyColor min-w-[60px]">{team.goals_for} - {team.goals_against}</p>
+                                                </td>
+                                                <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
+                                                    <p className="text-greyColor">{team.goal_difference}</p>
+                                                </td>
+                                                <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
+                                                    <p className="text-greyColor">{team.points}</p>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                <div className="flex flex-col items-center px-5 py-5 bg-primaryBlueColor xs:flex-row xs:justify-between border-t border-bgColor"></div>
                             </div>
-
                         </div>
                     </div>
-                </div>
-                <div className="py-5">
-                    <div className="flex flex-row justify-between  w-full mb-1 sm:mb-0">
-                        <h2 className="text-3xl leading-tight m-2 font-roboto font-bold text-foreground">
-                            GRUPO B
-                        </h2>
-
-                    </div>
-                    <div className="px-4 py-0 -mx-4 overflow-x-auto sm:-mx-8 sm:px-8">
-                        <div className="inline-block min-w-full overflow-hidden rounded-lg ">
-                            <table className="min-w-full leading-normal">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" className=" w-1  text-md font-mono font-semibold text-left  border-b border-bgColor">
-                                        </th>
-                                        <th scope="col" className="  px-5 py-1 w-2 text-md font-mono font-semibold text-left  border-b border-bgColor">
-                                        </th>
-                                        <th scope="col" className="px-5 py-1  text-lg font-mono font-normal  text-left text-gray-400   border-b border-bgColor">
-
-                                        </th>
-                                        <th scope="col" className="px-7 py-1 w-2 text-md font-mono font-semibold text-right text-greyColor   border-b border-bgColor">
-                                            Partidos
-                                        </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">
-                                            V
-                                        </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">
-                                            E
-                                        </th>
-                                        <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">
-                                            D
-                                        </th>
-                                        <th scope="col" className=" py-1 w-4 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">
-                                            Goles
-                                        </th>
-                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono font-semibold text-center  text-greyColor   border-b border-bgColor">
-                                            +/-
-                                        </th>
-                                        <th scope="col" className="px-5 py-1 w-2 text-md font-mono  text-right text-greyColor  border-b border-bgColor">
-                                            Puntos
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody  >
-                                    {positions?.data.B.map((team, index) => (
-                                        <tr key={team.team_id}>
-                                            <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <p className="text-greyColor">{index + 1}</p>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <div className="w-10 h-full">
-                                                    {teamImagesB[team.team_id] ? (
-                                                        <Image 
-                                                            src={teamImagesB[team.team_id]}
-                                                            alt={team.team_name}
-                                                            width={40}
-                                                            height={40}
-                                                            className="w-full h-full rounded-full"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full animate-pulse bg-gray-300 rounded-full" />
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                <p className="text-foreground font-semibold hover:text-greyColor cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})} >{team.team_name}</p>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm border-b border-bgColor text-center">
-                                                <p className="text-greyColor">{team.matches_played}</p>
-                                            </td>
-                                            <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.wins}</p>
-                                            </td>
-                                            <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.draws}</p>
-                                            </td>
-                                            <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.losses}</p>
-                                            </td>
-                                            <td className="px-3 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor min-w-[60px]">{team.goals_for} - {team.goals_against}</p>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.goal_difference}</p>
-                                            </td>
-                                            <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                <p className="text-greyColor">{team.points}</p>
-                                            </td>
-                                        </tr>
-                                    ))}
-
-
-                                </tbody>
-                            </table>
-                            <div className="flex flex-col items-center px-5 py-5 bg-primaryBlueColor xs:flex-row xs:justify-between border-t border-bgColor">
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
+                ))}
             </div>
         </>
     );

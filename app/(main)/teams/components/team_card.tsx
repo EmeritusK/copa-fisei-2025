@@ -4,22 +4,18 @@ import React, { useEffect, useState } from "react";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation'
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
-import { TeamService } from "@/app/lib/services/teams.service";
+import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
 
 export default function TeamCard({ team }: { team: TeamMainInfo }) {
     const [image, setImage] = useState('');
     const router = useRouter();
 
-
     useEffect(() => {
-        getTeamLogoUrl();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    async function getTeamLogoUrl() {
-        setImage(await TeamService.getTeamLogoUrl({ teamId: team.id }));
-        console.log(image);
-    }
+        async function fetchImage() {
+            setImage(await getTeamLogoUrl({ teamId: team.id }));
+        }
+        fetchImage();
+    }, [team.id]);
 
     async function openSinglePage() {
         router.push(`/teams/${team.name}=${team.id}`);

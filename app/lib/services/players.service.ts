@@ -1,78 +1,35 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { createClient } from "@/utils/supabase/client";
+'use server'
 import { Player } from "../types/player.interface";
-import { DatabaseError, ImageNotFoundError, NoDataError } from "../errors/database.errors";
+import { DatabaseError } from "../errors/database.errors";
+import { prisma } from '../prisma';
 
+function getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : 'Unknown error';
+}
 
+export async function getPlayers(): Promise<Player[]> {
+    try {
+        const players = await prisma.player.findMany({
+            orderBy: { name: 'asc' }
+        });
 
-
-export class PlayerService {
-
-    static supabase = createClient();
-
-    static async getPlayers(): Promise<Player[]> {
-        try {
-            const { data, error } = await this.supabase
-                .from('players')
-                .select('*')
-                .order('name', { ascending: true });
-
-            if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            const rows = Array.isArray(data) ? data : [];
-            return rows as Player[];
-        } catch (error) {
-            console.error('Error fetching players:', error);
-            throw error;
-        }
+        return players as unknown as Player[];
+    } catch (error: unknown) {
+        console.error('Error fetching players:', error);
+        throw new DatabaseError(`Database error: ${getErrorMessage(error)}`);
     }
+}
 
+export async function getPlayersByTeamId({ teamId }: { teamId: string }): Promise<Player[]> {
+    try {
+        const players = await prisma.player.findMany({
+            where: { team_id: teamId },
+            orderBy: { name: 'asc' }
+        });
 
-    static async getPlayersByTeamId({ teamId }: { teamId: string }): Promise<Player[]> {
-        try {
-            const { data, error } = await this.supabase
-                .from('players')
-                .select('*')
-                .eq('team_id', teamId)
-                .order('name', { ascending: true });
-
-            if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            const rows = Array.isArray(data) ? data : [];
-            return rows as Player[];
-        } catch (error) {
-            console.error('Error fetching players:', error);
-            throw error;
-        }
+        return players as unknown as Player[];
+    } catch (error: unknown) {
+        console.error('Error fetching players:', error);
+        throw new DatabaseError(`Database error: ${getErrorMessage(error)}`);
     }
-
-
-
-    static async getPlayerImageUrl({ playerId }: { playerId: string }): Promise<string> {
-        try {
-            const supportedFormats = ['png', 'jpg', 'jpeg', 'webp', 'svg'];
-            
-            for (const format of supportedFormats) {
-                const { data } = this.supabase
-                    .storage
-                    .from('players-images')
-                    .getPublicUrl(`${playerId}.${format}`);
-                
-                const img = new Image();
-                await new Promise((resolve) => {
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                    img.src = data.publicUrl;
-                });
-                
-                if (img.complete && img.naturalHeight !== 0) {
-                    return data.publicUrl;
-                }
-            }
-            
-            return ''; // Retorna cadena vacía si no se encuentra la imagen
-        } catch (error) {
-            console.error('Error getting player image:', error);
-            return '';
-        }
-    }
-
 }
