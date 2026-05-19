@@ -1,21 +1,14 @@
 
 'use client'
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation'
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
-import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { resolveTeamLogoPath } from '@/app/lib/teamLocalLogos';
 
 export default function TeamCard({ team }: { team: TeamMainInfo }) {
-    const [image, setImage] = useState('');
+    const image = resolveTeamLogoPath(team.name);
     const router = useRouter();
-
-    useEffect(() => {
-        async function fetchImage() {
-            setImage(await getTeamLogoUrl({ teamId: team.id }));
-        }
-        fetchImage();
-    }, [team.id]);
 
     async function openSinglePage() {
         router.push(`/teams/${team.name}=${team.id}`);
@@ -33,17 +26,14 @@ export default function TeamCard({ team }: { team: TeamMainInfo }) {
                 className="cursor-pointer hover:cursor-pointer bg-primaryBlueColor h-24 w-72 grid grid-cols-3 gap-0 justify-start items-center rounded-lg">
                 <div className="w-8">
                     <div className="ml-2 w-18 h-full p-1 overflow-hidden">
-                        {image ? (
-                            <Image
-                                src={image}
-                                width={100}
-                                height={100}
-                                alt="Logo del equipo"
-                                className="w-full h-full"
-                            />
-                        ) : (
-                            <div className="w-full h-full animate-pulse bg-gray-300 rounded-full" />
-                        )}
+                        <Image
+                            src={image}
+                            width={100}
+                            height={100}
+                            alt="Logo del equipo"
+                            className="w-full h-full"
+                            unoptimized
+                        />
                     </div>
                 </div>
                 <div className="ml-2 w-36 grid-rows-2">

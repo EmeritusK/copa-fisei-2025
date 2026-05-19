@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import Image from 'next/image';
 import { MatchData } from '../../../lib/types/matches.interface';
 import styled from 'styled-components';
-import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { resolveTeamLogoPath } from '@/app/lib/teamLocalLogos';
 import { teamLogoImageStyle } from '@/app/lib/teamLogoDisplay';
 import { GiWhistle } from 'react-icons/gi';
 import { MdOutlineLiveTv } from 'react-icons/md';
@@ -122,34 +122,6 @@ const TeamLogo = styled.img`
 `;
 
 const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
-    const [teamImages, setTeamImages] = useState<Record<string, string>>({});
-
-    useEffect(() => {
-        let cancelled = false;
-        (async () => {
-            try {
-                const ids = new Set<string>();
-                for (const m of matches) {
-                    ids.add(m.home_team.home_team_id);
-                    ids.add(m.away_team.away_team_id);
-                }
-                const entries = await Promise.all(
-                    Array.from(ids).map(async (teamId) => {
-                        const imageUrl = await getTeamLogoUrl({ teamId });
-                        return [teamId, imageUrl] as const;
-                    })
-                );
-                if (cancelled) return;
-                setTeamImages(Object.fromEntries(entries));
-            } catch (e) {
-                console.error('Error loading team logos:', e);
-            }
-        })();
-        return () => {
-            cancelled = true;
-        };
-    }, [matches]);
-
     const dayGroups = useMemo(() => groupMatchesByCalendarDay(matches), [matches]);
 
     if (matches.length === 0) {
@@ -177,8 +149,8 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
                             <ul className="mt-2 flex flex-col gap-1">
                                 {group.items.map((match) => {
                                     const finished = isFinished(match.status);
-                                    const homeImg = teamImages[match.home_team.home_team_id];
-                                    const awayImg = teamImages[match.away_team.away_team_id];
+                                    const homeImg = resolveTeamLogoPath(match.home_team.home_team_name);
+                                    const awayImg = resolveTeamLogoPath(match.away_team.away_team_name);
                                     const homeAbbr = match.home_team.home_team_acronym.toUpperCase();
                                     const awayAbbr = match.away_team.away_team_acronym.toUpperCase();
                                     const homeScore = finished
@@ -199,17 +171,15 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
                                                 <span className="truncate text-right text-sm font-semibold text-foreground">
                                                     {match.home_team.home_team_name}
                                                 </span>
-                                                {homeImg ? (
-                                                    <Image
-                                                        src={homeImg}
-                                                        alt={match.home_team.home_team_name}
-                                                        width={40}
-                                                        height={40}
-                                                        className="h-10 w-10 shrink-0 object-contain"
-                                                        style={teamLogoImageStyle(match.home_team.home_team_name)}
-                                                        unoptimized
-                                                    />
-                                                ) : null}
+                                                <Image
+                                                    src={homeImg}
+                                                    alt={match.home_team.home_team_name}
+                                                    width={40}
+                                                    height={40}
+                                                    className="h-10 w-10 shrink-0 object-contain"
+                                                    style={teamLogoImageStyle(match.home_team.home_team_name)}
+                                                    unoptimized
+                                                />
                                             </div>
                                             <div className="flex shrink-0 items-center gap-0.5">
                                                 <div className="flex h-[4.25rem] w-[3.25rem] flex-col items-center justify-between rounded border border-grayBorderColor bg-[#0a1020] px-1 py-1.5">
@@ -230,17 +200,15 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
                                                 </div>
                                             </div>
                                             <div className="flex min-w-0 flex-1 items-center justify-start gap-3">
-                                                {awayImg ? (
-                                                    <Image
-                                                        src={awayImg}
-                                                        alt={match.away_team.away_team_name}
-                                                        width={40}
-                                                        height={40}
-                                                        className="h-10 w-10 shrink-0 object-contain"
-                                                        style={teamLogoImageStyle(match.away_team.away_team_name)}
-                                                        unoptimized
-                                                    />
-                                                ) : null}
+                                                <Image
+                                                    src={awayImg}
+                                                    alt={match.away_team.away_team_name}
+                                                    width={40}
+                                                    height={40}
+                                                    className="h-10 w-10 shrink-0 object-contain"
+                                                    style={teamLogoImageStyle(match.away_team.away_team_name)}
+                                                    unoptimized
+                                                />
                                                 <span className="truncate text-left text-sm font-semibold text-foreground">
                                                     {match.away_team.away_team_name}
                                                 </span>
@@ -272,7 +240,7 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
                         <TeamRow>
                             <div style={{ textAlign: 'center' }}>
                                 <TeamLogo
-                                    src={teamImages[match.home_team.home_team_id]}
+                                    src={resolveTeamLogoPath(match.home_team.home_team_name)}
                                     alt={match.home_team.home_team_name}
                                     style={teamLogoImageStyle(match.home_team.home_team_name)}
                                 />
@@ -281,7 +249,7 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
                             <div>vs</div>
                             <div style={{ textAlign: 'center' }}>
                                 <TeamLogo
-                                    src={teamImages[match.away_team.away_team_id]}
+                                    src={resolveTeamLogoPath(match.away_team.away_team_name)}
                                     alt={match.away_team.away_team_name}
                                     style={teamLogoImageStyle(match.away_team.away_team_name)}
                                 />

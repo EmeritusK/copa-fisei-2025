@@ -4,7 +4,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation'
 import PlayerCard from "../../components/players/player_card";
 import { Player } from "@/app/lib/types/player.interface";
-import { getTeamById, getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { getTeamById } from '@/app/lib/services/teams.service';
+import { resolveTeamLogoPath } from '@/app/lib/teamLocalLogos';
 import { teamLogoImageStyle } from '@/app/lib/teamLogoDisplay';
 import { getPlayersByTeamId } from '@/app/lib/services/players.service';
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
@@ -12,7 +13,6 @@ import { TeamMainInfo } from "@/app/lib/types/team.interface";
 
 
 export default function Page() {
-    const [image, setImage] = useState('');
     const [playersData, setPlayersData] = useState<Player[]>([]);
     const [team, setTeam] = useState<TeamMainInfo | null>(null);
     const pathname = usePathname();
@@ -24,16 +24,12 @@ export default function Page() {
             const t = await getTeamById({ teamId });
             if (t) setTeam(t);
         }
-        async function fetchImage() {
-            setImage(await getTeamLogoUrl({ teamId }));
-        }
         async function fetchPlayers() {
             setPlayersData(await getPlayersByTeamId({ teamId }));
         }
 
         fetchTeam();
         fetchPlayers();
-        fetchImage();
     }, [teamId]);
 
 
@@ -44,14 +40,14 @@ export default function Page() {
     <div>
             <div className="bg-primaryBlueColor w-full py-4 px-12 rounded-3xl flex items-center justify-center">
                     <div className="w-[10%] h-auto relative flex items-center justify-center overflow-hidden rounded-md aspect-square max-h-[100px]">
-                        {image ? (
+                        {team ? (
                             <Image
-                                src={image}
+                                src={resolveTeamLogoPath(team.name)}
                                 width={100}
                                 height={100}
                                 alt="Logo del equipo"
                                 className="w-full h-full object-cover"
-                                style={teamLogoImageStyle(team?.name)}
+                                style={teamLogoImageStyle(team.name)}
                                 unoptimized
                             />
                         ) : (
