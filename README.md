@@ -50,15 +50,24 @@ A modern web application for managing and tracking the FISEI Cup 2025 football t
    bun install
    ```
 
-3. **Configure environment variables**
-   
-   Create a `.env.local` file in the project root:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+3. **Start PostgreSQL with Docker**
+   ```bash
+   docker compose up -d
    ```
 
-4. **Run the development server**
+4. **Configure environment variables**
+   
+   Create or update `.env` in the project root:
+   ```env
+   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/copa_fisei?schema=public"
+   ```
+
+5. **Apply Prisma schema**
+   ```bash
+   npx prisma db push
+   ```
+
+6. **Run the development server**
    ```bash
    npm run dev
    # or
@@ -69,7 +78,7 @@ A modern web application for managing and tracking the FISEI Cup 2025 football t
    bun dev
    ```
 
-5. **Open in browser**
+7. **Open in browser**
    
    Visit [http://localhost:3000](http://localhost:3000) to view the application.
 

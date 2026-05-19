@@ -5,8 +5,7 @@ export interface RankingResponse {
 }
 
 export interface Data {
-    A: Group[];
-    B: Group[];
+    [groupName: string]: Group[];
 }
 
 export interface Group {

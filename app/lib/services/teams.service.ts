@@ -1,67 +1,62 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { createClient } from '@/utils/supabase/client';
-import { DatabaseError, ImageNotFoundError, NoDataError } from '../errors/database.errors';
+'use server'
+import { DatabaseError, NoDataError } from '../errors/database.errors';
 import { TeamMainInfo } from '../types/team.interface';
+import { prisma } from '../prisma';
+import { resolveTeamLogoPath } from '../teamLocalLogos';
 
-export class TeamService {
-    static supabase = createClient();
+function getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : 'Unknown error';
+}
 
-    static defaultImage = "https://mqsikcvonyfulmbpyvts.supabase.co/storage/v1/object/public/team-logos//default.svg";
+export async function getTeamById({ teamId }: { teamId: string }): Promise<TeamMainInfo> {
+    try {
+        const team = await prisma.team.findUnique({
+            where: { id: teamId }
+        });
 
+        if (!team) throw new NoDataError('No se encontró el equipo');
 
-    static async getTeamById({ teamId }: { teamId: string }): Promise<TeamMainInfo> {
-        try {
-            const { data, error } = await this.supabase
-                .from('teams')
-                .select('*')
-                .eq('id', teamId)
-                .single();
-
-
-            if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            if (!data) throw new NoDataError('No se encontró el equipo');
-
-
-            return data as TeamMainInfo;
-        } catch (error) {
-            console.error('Error fetching team:', error);
-            throw error;
-        }
+        return {
+            id: team.id,
+            name: team.name,
+            acronym: team.acronym,
+            career_acronym: team.career_acronym
+        } as TeamMainInfo;
+    } catch (error: unknown) {
+        console.error('Error fetching team:', error);
+        if (error instanceof NoDataError) throw error;
+        throw new DatabaseError(`Database error: ${getErrorMessage(error)}`);
     }
+}
 
-    static async getTeams(): Promise<TeamMainInfo[]> {
-        try {
-            const { data, error } = await this.supabase
-                .from('teams')
-                .select('*')
-                .order('name', { ascending: true });
+export async function getTeams(): Promise<TeamMainInfo[]> {
+    try {
+        const teams = await prisma.team.findMany({
+            orderBy: { name: 'asc' }
+        });
 
-            if (error) throw new DatabaseError(`Supabase error: ${error.message}`);
-            const rows = Array.isArray(data) ? data : [];
-            return rows as TeamMainInfo[];
-        } catch (error) {
-            console.error('Error fetching teams:', error);
-            throw error;
-        }
+        return teams.map(team => ({
+            id: team.id,
+            name: team.name,
+            acronym: team.acronym,
+            career_acronym: team.career_acronym
+        })) as TeamMainInfo[];
+    } catch (error: unknown) {
+        console.error('Error fetching teams:', error);
+        throw new DatabaseError(`Database error: ${getErrorMessage(error)}`);
     }
+}
 
-    static async getTeamLogoUrl({ teamId }: { teamId: string }): Promise<string> {
-        try {
-            const { data } = this.supabase
-                .storage
-                .from('team-logos')
-                .getPublicUrl(`${teamId}.svg`);
+export async function getTeamLogoUrl({ teamId }: { teamId: string }): Promise<string> {
+    try {
+        const team = await prisma.team.findUnique({
+            where: { id: teamId },
+            select: { name: true },
+        });
+        if (!team) return resolveTeamLogoPath('');
 
-
-                return data.publicUrl;
-            
-        } catch (error) {
-            if (error instanceof ImageNotFoundError) {
-                return this.defaultImage;
-            }
-            console.error('Error getting team logo:', error);
-            throw error;
-        }
+        return resolveTeamLogoPath(team.name);
+    } catch {
+        return resolveTeamLogoPath('');
     }
-
 }

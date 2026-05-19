@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 import React, { useEffect, useState } from 'react';
 import Slider from "react-slick";
-import { TeamService } from '@/app/lib/services/teams.service';
+import { getTeams } from '@/app/lib/services/teams.service';
 import SmallTeamCard from './smallTeamCard';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -29,15 +28,9 @@ function TeamsSlider() {
 
     const [teamsData, setTeamsData] = useState<React.ReactElement[]>([]);
 
-    const [charge, setCharge] = useState<React.ReactElement[]>(skeleton);
-
-
-    useEffect(() => {
-        fetchTeams();
-    }, []);
     const fetchTeams = async () => {
         try {
-            const teamsData = await TeamService.getTeams();
+            const teamsData = await getTeams();
             if (teamsData) {
                 const teamsSlider = [];
                 for (const team of teamsData) {
@@ -53,6 +46,12 @@ function TeamsSlider() {
             console.error('Error al obtener equipos:', error);
         }
     };
+    const charge = skeleton;
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchTeams();
+    }, []);
     const settings = {
         dots: true,
         arrows: true,

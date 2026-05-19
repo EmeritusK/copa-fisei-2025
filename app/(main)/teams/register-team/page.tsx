@@ -5,8 +5,6 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation'
 import PlayerCard from "../../components/players/player_card";
 import { Player } from "@/app/lib/types/player.interface";
-import { TeamService } from "@/app/lib/services/teams.service";
-import { PlayerService } from "@/app/lib/services/players.service";
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
 
 

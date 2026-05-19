@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState, useMemo } from 'react';
-import { MatchService } from '../../lib/services/matches.service';
+import { getMatches } from '../../lib/services/matches.service';
 import { MatchData } from '../../lib/types/matches.interface';
 import MatchesContainer from './components/matches_container';
 import styled from 'styled-components';
@@ -64,7 +64,7 @@ const MatchesPage = () => {
     useEffect(() => {
         const fetchMatches = async () => {
             try {
-                const result = await MatchService.getMatches();
+                const result = await getMatches();
                 const data = result?.data || [];
                 setMatches(data);
             } catch (error) {
