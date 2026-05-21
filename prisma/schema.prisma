@@ -44,4 +44,5 @@ model Match {
   status          String
   homeTeam        Team     @relation("HomeMatches", fields: [home_team_id], references: [id])
   awayTeam        Team     @relation("AwayMatches", fields: [away_team_id], references: [id])
+  details         Json?
 }

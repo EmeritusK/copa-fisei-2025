@@ -27,7 +27,7 @@ export async function getStandings(): Promise<RankingResponse> {
         }
 
         for (const match of matches) {
-            if (match.status === 'SCHEDULED' || match.status === 'PROGRAMADO') continue;
+            if (match.status === 'SCHEDULED' || match.status === 'PROGRAMADO' || match.status === 'Pendiente') continue;
 
             const home = standings[match.home_team_id];
             const away = standings[match.away_team_id];

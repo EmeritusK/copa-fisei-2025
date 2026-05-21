@@ -25,6 +25,8 @@ export const TEAM_LOCAL_LOGO_BY_NAME: Record<string, string> = {
   'Resaca FC': '/teams/resaca.png',
   'Vodka Juniors': '/teams/VodkaJr.png',
   Warriors: '/teams/Warriors.png',
+  Portuñaña: '/teams/default-shield.svg',
+  'Los Tiguerones FC': '/teams/default-shield.svg',
 };
 
 const defaultTeamShield = '/teams/default-shield.svg';

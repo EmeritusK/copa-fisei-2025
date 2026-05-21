@@ -2,8 +2,6 @@
 import { DatabaseError, NoDataError } from '../errors/database.errors';
 import { TeamMainInfo } from '../types/team.interface';
 import { prisma } from '../prisma';
-import { resolveTeamLogoPath } from '../teamLocalLogos';
-
 function getErrorMessage(error: unknown): string {
     return error instanceof Error ? error.message : 'Unknown error';
 }
@@ -44,19 +42,5 @@ export async function getTeams(): Promise<TeamMainInfo[]> {
     } catch (error: unknown) {
         console.error('Error fetching teams:', error);
         throw new DatabaseError(`Database error: ${getErrorMessage(error)}`);
-    }
-}
-
-export async function getTeamLogoUrl({ teamId }: { teamId: string }): Promise<string> {
-    try {
-        const team = await prisma.team.findUnique({
-            where: { id: teamId },
-            select: { name: true },
-        });
-        if (!team) return resolveTeamLogoPath('');
-
-        return resolveTeamLogoPath(team.name);
-    } catch {
-        return resolveTeamLogoPath('');
     }
 }

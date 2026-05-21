@@ -6,7 +6,7 @@ import { getTeams } from '@/app/lib/services/teams.service';
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
 
 export default function Page() {
-    const[teams,setTeams] = useState<TeamMainInfo[]>([]);
+    const [teams, setTeams] = useState<TeamMainInfo[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -24,17 +24,55 @@ export default function Page() {
         fetchEquipos();
     }, []);
 
+    return (
+        <div className="pb-12">
+            <header
+                className="relative overflow-hidden px-4 py-12 sm:px-6"
+                style={{
+                    background: 'var(--header-bg)',
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                }}
+            >
+                {/* Patrón de fondo */}
+                <div
+                    className="absolute inset-0 opacity-[0.035]"
+                    style={{
+                        backgroundImage: `repeating-linear-gradient(
+                            -55deg,
+                            #ffffff 0,
+                            #ffffff 1px,
+                            transparent 1px,
+                            transparent 16px
+                        )`,
+                    }}
+                    aria-hidden
+                />
+                
+                <div className="relative mx-auto max-w-5xl">
+                    <p
+                        className="text-[10px] font-bold uppercase tracking-[0.25em]"
+                        style={{ color: 'var(--accent)' }}
+                    >
+                        Copa FISEI 2026
+                    </p>
+                    <h1 className="mt-2 font-roboto text-3xl font-black uppercase tracking-tight text-white sm:text-4xl">
+                        Equipos Participantes
+                    </h1>
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                        {teams.length > 0 
+                            ? `Conoce a los ${teams.length} equipos que compiten por la gloria en esta edición. Explora sus plantillas y escudos oficiales.`
+                            : 'Cargando equipos…'}
+                    </p>
+                </div>
+            </header>
 
-    return (        
-        <>
-            <h4 className='mt-6 mb-2 mx-4 text-whiteColor body-font font-roboto font-semibold text-3xl'>EQUIPOS</h4>
-            <div className="flex flex-auto items-center align-center">
-                <div className='flex flex-wrap items-center gap-2 justify-center'>
+            <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {teams.map((team) => (
-                        <TeamCard team={team} key={team.id}></TeamCard>
+                        <TeamCard team={team} key={team.id} />
                     ))}
                 </div>
             </div>
-        </>
+        </div>
     );
 }

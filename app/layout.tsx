@@ -26,8 +26,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Copa FISEI 2025",
-  description: "Copa FISEI 2025",
+  title: "Copa FISEI 2026",
+  description: "Copa FISEI 2026",
 };
 
 export default function RootLayout({

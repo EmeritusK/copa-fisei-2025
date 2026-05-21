@@ -1,13 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import Image from 'next/image';
 import { MatchData } from '../../../lib/types/matches.interface';
-import styled from 'styled-components';
-import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { resolveTeamLogoPath } from '@/app/lib/teamLocalLogos';
 import { teamLogoImageStyle } from '@/app/lib/teamLogoDisplay';
-import { GiWhistle } from 'react-icons/gi';
-import { MdOutlineLiveTv } from 'react-icons/md';
 
 interface MatchesContainerProps {
     matches: MatchData[];
@@ -41,6 +38,10 @@ function isFinished(status: string): boolean {
     return s === 'FINALIZADO' || s === 'FINISHED' || s === 'FT';
 }
 
+function formatMatchTime(time: string): string {
+    return time.slice(0, 5);
+}
+
 function groupMatchesByCalendarDay(list: MatchData[]): { key: string; firstDate: Date; items: MatchData[] }[] {
     const sorted = [...list].sort((a, b) => {
         const ta = new Date(`${a.date}T${a.time}`).getTime();
@@ -54,11 +55,7 @@ function groupMatchesByCalendarDay(list: MatchData[]): { key: string; firstDate:
         const key = localDateKey(m.date);
         if (key !== currentKey) {
             if (bucket.length) {
-                groups.push({
-                    key: currentKey,
-                    firstDate: new Date(bucket[0].date),
-                    items: bucket,
-                });
+                groups.push({ key: currentKey, firstDate: new Date(bucket[0].date), items: bucket });
             }
             currentKey = key;
             bucket = [m];
@@ -67,94 +64,20 @@ function groupMatchesByCalendarDay(list: MatchData[]): { key: string; firstDate:
         }
     }
     if (bucket.length) {
-        groups.push({
-            key: currentKey,
-            firstDate: new Date(bucket[0].date),
-            items: bucket,
-        });
+        groups.push({ key: currentKey, firstDate: new Date(bucket[0].date), items: bucket });
     }
     return groups;
 }
 
-const MatchCard = styled.li`
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid var(--grayBorderColor);
-    border-radius: 8px;
-    padding: 16px;
-    margin: 8px;
-    width: 300px;
-    height: 200px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    background-color: var(--primaryBlueColor);
-`;
-
-const TeamRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 20px;
-`;
-
-const TeamAcronym = styled.div`
-    font-size: 24px;
-    font-weight: bold;
-`;
-
-const MatchInfo = styled.div`
-    font-size: 14px;
-    color: var(--greyColor);
-`;
-
-const MatchStatus = styled.div<{ $finalizado?: boolean }>`
-    font-size: 14px;
-    color: ${(props) => (props.$finalizado ? 'var(--redColor)' : 'var(--greyColor)')};
-    font-weight: bold;
-`;
-
-const TeamLogo = styled.img`
-    width: 40px;
-    height: 40px;
-    margin-bottom: 8px;
-    object-fit: contain;
-`;
-
 const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
-    const [teamImages, setTeamImages] = useState<Record<string, string>>({});
-
-    useEffect(() => {
-        let cancelled = false;
-        (async () => {
-            try {
-                const ids = new Set<string>();
-                for (const m of matches) {
-                    ids.add(m.home_team.home_team_id);
-                    ids.add(m.away_team.away_team_id);
-                }
-                const entries = await Promise.all(
-                    Array.from(ids).map(async (teamId) => {
-                        const imageUrl = await getTeamLogoUrl({ teamId });
-                        return [teamId, imageUrl] as const;
-                    })
-                );
-                if (cancelled) return;
-                setTeamImages(Object.fromEntries(entries));
-            } catch (e) {
-                console.error('Error loading team logos:', e);
-            }
-        })();
-        return () => {
-            cancelled = true;
-        };
-    }, [matches]);
-
     const dayGroups = useMemo(() => groupMatchesByCalendarDay(matches), [matches]);
 
     if (matches.length === 0) {
         return (
-            <p className="text-center text-greyColor py-12 text-sm">
+            <p
+                className="py-12 text-center text-sm"
+                style={{ color: 'var(--muted)' }}
+            >
                 No hay partidos para mostrar.
             </p>
         );
@@ -162,94 +85,131 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
 
     return (
         <div className="w-full max-w-5xl mx-auto px-3 sm:px-4">
-            {/* Desktop: list by day */}
-            <div className="hidden md:block">
+            {/* Desktop — list by day */}
+            <div className="hidden md:block space-y-8">
                 {dayGroups.map((group) => {
                     const { weekday, dateLine } = dayHeaderParts(group.firstDate);
                     return (
-                        <section key={group.key} className="mb-10">
-                            <header className="flex items-baseline justify-between gap-4 pb-4 pt-2 border-b border-grayBorderColor">
-                                <h2 className="text-lg font-bold tracking-wide text-foreground">
+                        <section key={group.key}>
+                            {/* Day header */}
+                            <header
+                                className="flex items-baseline justify-between gap-4 pb-2 mb-1"
+                                style={{ borderBottom: '2px solid var(--accent)' }}
+                            >
+                                <h2
+                                    className="text-xs font-bold uppercase tracking-wider"
+                                    style={{ color: 'var(--foreground)' }}
+                                >
                                     {weekday}
                                 </h2>
-                                <p className="text-sm text-greyColor shrink-0">{dateLine}</p>
+                                <p
+                                    className="shrink-0 text-xs"
+                                    style={{ color: 'var(--muted)' }}
+                                >
+                                    {dateLine}
+                                </p>
                             </header>
-                            <ul className="mt-2 flex flex-col gap-1">
-                                {group.items.map((match) => {
+
+                            <ul>
+                                {group.items.map((match, idx) => {
                                     const finished = isFinished(match.status);
-                                    const homeImg = teamImages[match.home_team.home_team_id];
-                                    const awayImg = teamImages[match.away_team.away_team_id];
-                                    const homeAbbr = match.home_team.home_team_acronym.toUpperCase();
-                                    const awayAbbr = match.away_team.away_team_acronym.toUpperCase();
-                                    const homeScore = finished
-                                        ? String(match.home_team.home_team_goals)
-                                        : '—';
-                                    const awayScore = finished
-                                        ? String(match.away_team.away_team_goals)
-                                        : '—';
+                                    const homeImg = resolveTeamLogoPath(match.home_team.home_team_name);
+                                    const awayImg = resolveTeamLogoPath(match.away_team.away_team_name);
                                     return (
                                         <li
                                             key={match.match_id}
-                                            className="flex items-stretch gap-2 rounded-md bg-primaryBlueColor border border-grayBorderColor px-3 py-3 min-h-[4.5rem]"
+                                            className="grid grid-cols-[3.5rem_1fr_auto_1fr_4rem] items-center gap-x-3 px-2 py-3.5 transition-colors"
+                                            style={{
+                                                borderBottom: '1px solid var(--border)',
+                                                background: idx % 2 === 0 ? 'var(--card)' : 'var(--card-stripe)',
+                                            }}
                                         >
-                                            <div className="flex w-9 shrink-0 items-center justify-center text-greyColor">
-                                                <GiWhistle className="h-5 w-5" aria-hidden />
-                                            </div>
-                                            <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
-                                                <span className="truncate text-right text-sm font-semibold text-foreground">
+                                            {/* Hora */}
+                                            <time
+                                                dateTime={`${match.date}T${match.time}`}
+                                                className="text-center text-sm font-medium tabular-nums"
+                                                style={{ color: 'var(--muted)' }}
+                                            >
+                                                {formatMatchTime(match.time)}
+                                            </time>
+
+                                            {/* Local */}
+                                            <div className="flex min-w-0 items-center justify-end gap-3">
+                                                <span
+                                                    className="truncate text-right text-sm font-semibold"
+                                                    style={{ color: 'var(--foreground)' }}
+                                                >
                                                     {match.home_team.home_team_name}
                                                 </span>
-                                                {homeImg ? (
-                                                    <Image
-                                                        src={homeImg}
-                                                        alt={match.home_team.home_team_name}
-                                                        width={40}
-                                                        height={40}
-                                                        className="h-10 w-10 shrink-0 object-contain"
-                                                        style={teamLogoImageStyle(match.home_team.home_team_name)}
-                                                        unoptimized
-                                                    />
-                                                ) : null}
+                                                <Image
+                                                    src={homeImg}
+                                                    alt=""
+                                                    width={36}
+                                                    height={36}
+                                                    className="h-9 w-9 shrink-0 object-contain"
+                                                    style={teamLogoImageStyle(match.home_team.home_team_name)}
+                                                    unoptimized
+                                                />
                                             </div>
-                                            <div className="flex shrink-0 items-center gap-0.5">
-                                                <div className="flex h-[4.25rem] w-[3.25rem] flex-col items-center justify-between rounded border border-grayBorderColor bg-[#0a1020] px-1 py-1.5">
-                                                    <span className="text-[0.65rem] font-semibold uppercase tracking-tight text-greyColor">
-                                                        {homeAbbr}
+
+                                            {/* Score */}
+                                            <div className="flex min-w-[4rem] flex-col items-center justify-center">
+                                                {finished ? (
+                                                    <span
+                                                        className="text-lg font-bold tabular-nums tracking-tight"
+                                                        style={{ color: 'var(--foreground)' }}
+                                                    >
+                                                        {match.home_team.home_team_goals}
+                                                        <span
+                                                            className="mx-1.5 font-normal"
+                                                            style={{ color: 'var(--muted)' }}
+                                                        >
+                                                            –
+                                                        </span>
+                                                        {match.away_team.away_team_goals}
                                                     </span>
-                                                    <span className="text-xl font-bold leading-none text-foreground">
-                                                        {homeScore}
+                                                ) : (
+                                                    <span
+                                                        className="text-xs font-bold uppercase tracking-widest"
+                                                        style={{ color: 'var(--muted)' }}
+                                                    >
+                                                        vs
                                                     </span>
-                                                </div>
-                                                <div className="flex h-[4.25rem] w-[3.25rem] flex-col items-center justify-between rounded border border-grayBorderColor bg-[#0a1020] px-1 py-1.5">
-                                                    <span className="text-[0.65rem] font-semibold uppercase tracking-tight text-greyColor">
-                                                        {awayAbbr}
-                                                    </span>
-                                                    <span className="text-xl font-bold leading-none text-foreground">
-                                                        {awayScore}
-                                                    </span>
-                                                </div>
+                                                )}
                                             </div>
-                                            <div className="flex min-w-0 flex-1 items-center justify-start gap-3">
-                                                {awayImg ? (
-                                                    <Image
-                                                        src={awayImg}
-                                                        alt={match.away_team.away_team_name}
-                                                        width={40}
-                                                        height={40}
-                                                        className="h-10 w-10 shrink-0 object-contain"
-                                                        style={teamLogoImageStyle(match.away_team.away_team_name)}
-                                                        unoptimized
-                                                    />
-                                                ) : null}
-                                                <span className="truncate text-left text-sm font-semibold text-foreground">
+
+                                            {/* Visitante */}
+                                            <div className="flex min-w-0 items-center gap-3">
+                                                <Image
+                                                    src={awayImg}
+                                                    alt=""
+                                                    width={36}
+                                                    height={36}
+                                                    className="h-9 w-9 shrink-0 object-contain"
+                                                    style={teamLogoImageStyle(match.away_team.away_team_name)}
+                                                    unoptimized
+                                                />
+                                                <span
+                                                    className="truncate text-sm font-semibold"
+                                                    style={{ color: 'var(--foreground)' }}
+                                                >
                                                     {match.away_team.away_team_name}
                                                 </span>
                                             </div>
-                                            <div className="flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 text-greyColor">
-                                                <MdOutlineLiveTv className="h-5 w-5" aria-hidden />
-                                                <span className="text-[0.65rem] leading-tight text-center">
-                                                    {finished ? 'Resultado' : 'Programado'}
-                                                </span>
+
+                                            {/* Status */}
+                                            <div className="text-right">
+                                                {finished && (
+                                                    <span
+                                                        className="inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                                                        style={{
+                                                            background: 'var(--accent)',
+                                                            color: '#fff',
+                                                        }}
+                                                    >
+                                                        FT
+                                                    </span>
+                                                )}
                                             </div>
                                         </li>
                                     );
@@ -260,40 +220,131 @@ const MatchesContainer: React.FC<MatchesContainerProps> = ({ matches }) => {
                 })}
             </div>
 
-            {/* Mobile: cards */}
-            <ul className="flex flex-wrap justify-center md:hidden">
-                {matches.map((match) => (
-                    <MatchCard key={match.match_id}>
-                        {isFinished(match.status) ? (
-                            <MatchStatus $finalizado={true}>{`Finalizado: ${match.home_team.home_team_goals} - ${match.away_team.away_team_goals}`}</MatchStatus>
-                        ) : (
-                            <MatchStatus>Programado</MatchStatus>
-                        )}
-                        <TeamRow>
-                            <div style={{ textAlign: 'center' }}>
-                                <TeamLogo
-                                    src={teamImages[match.home_team.home_team_id]}
-                                    alt={match.home_team.home_team_name}
-                                    style={teamLogoImageStyle(match.home_team.home_team_name)}
-                                />
-                                <TeamAcronym>{match.home_team.home_team_acronym}</TeamAcronym>
+            {/* Mobile — cards */}
+            <div className="md:hidden space-y-6">
+                {dayGroups.map((group) => {
+                    const { weekday, dateLine } = dayHeaderParts(group.firstDate);
+                    return (
+                        <section key={group.key}>
+                            <header
+                                className="flex items-baseline justify-between gap-4 pb-2 mb-2"
+                                style={{ borderBottom: '2px solid var(--accent)' }}
+                            >
+                                <h2
+                                    className="text-xs font-bold uppercase tracking-wider"
+                                    style={{ color: 'var(--foreground)' }}
+                                >
+                                    {weekday}
+                                </h2>
+                                <p className="shrink-0 text-xs" style={{ color: 'var(--muted)' }}>
+                                    {dateLine}
+                                </p>
+                            </header>
+
+                            <div className="space-y-2">
+                                {group.items.map((match) => {
+                                    const finished = isFinished(match.status);
+                                    return (
+                                        <div
+                                            key={match.match_id}
+                                            className="flex flex-col rounded overflow-hidden"
+                                            style={{
+                                                border: '1px solid var(--border)',
+                                                background: 'var(--card)',
+                                            }}
+                                        >
+                                            {/* Status bar */}
+                                            <div
+                                                className="flex items-center justify-between px-4 py-1.5"
+                                                style={{
+                                                    background: finished ? 'var(--accent)' : 'var(--card-stripe)',
+                                                    borderBottom: '1px solid var(--border)',
+                                                }}
+                                            >
+                                                <span
+                                                    className="text-[10px] font-bold uppercase tracking-wider"
+                                                    style={{ color: finished ? '#fff' : 'var(--muted)' }}
+                                                >
+                                                    {finished ? 'Finalizado' : formatMatchTime(match.time)}
+                                                </span>
+                                                {finished && (
+                                                    <span
+                                                        className="text-[10px] font-bold text-white uppercase tracking-wider"
+                                                    >
+                                                        FT
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Teams */}
+                                            <div className="flex items-center justify-between gap-3 px-4 py-4">
+                                                {/* Local */}
+                                                <div className="flex flex-col items-center gap-1.5 flex-1">
+                                                    <Image
+                                                        src={resolveTeamLogoPath(match.home_team.home_team_name)}
+                                                        alt={match.home_team.home_team_name}
+                                                        width={40}
+                                                        height={40}
+                                                        className="h-10 w-10 object-contain"
+                                                        style={teamLogoImageStyle(match.home_team.home_team_name)}
+                                                        unoptimized
+                                                    />
+                                                    <span
+                                                        className="text-center text-xs font-bold uppercase tracking-wide"
+                                                        style={{ color: 'var(--foreground)' }}
+                                                    >
+                                                        {match.home_team.home_team_acronym}
+                                                    </span>
+                                                </div>
+
+                                                {/* Score */}
+                                                <div className="flex flex-col items-center shrink-0 min-w-[3.5rem]">
+                                                    {finished ? (
+                                                        <span
+                                                            className="text-xl font-bold tabular-nums"
+                                                            style={{ color: 'var(--foreground)' }}
+                                                        >
+                                                            {match.home_team.home_team_goals}
+                                                            <span style={{ color: 'var(--muted)' }}> – </span>
+                                                            {match.away_team.away_team_goals}
+                                                        </span>
+                                                    ) : (
+                                                        <span
+                                                            className="text-xs font-bold uppercase tracking-widest"
+                                                            style={{ color: 'var(--muted)' }}
+                                                        >
+                                                            vs
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {/* Visitante */}
+                                                <div className="flex flex-col items-center gap-1.5 flex-1">
+                                                    <Image
+                                                        src={resolveTeamLogoPath(match.away_team.away_team_name)}
+                                                        alt={match.away_team.away_team_name}
+                                                        width={40}
+                                                        height={40}
+                                                        className="h-10 w-10 object-contain"
+                                                        style={teamLogoImageStyle(match.away_team.away_team_name)}
+                                                        unoptimized
+                                                    />
+                                                    <span
+                                                        className="text-center text-xs font-bold uppercase tracking-wide"
+                                                        style={{ color: 'var(--foreground)' }}
+                                                    >
+                                                        {match.away_team.away_team_acronym}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                            <div>vs</div>
-                            <div style={{ textAlign: 'center' }}>
-                                <TeamLogo
-                                    src={teamImages[match.away_team.away_team_id]}
-                                    alt={match.away_team.away_team_name}
-                                    style={teamLogoImageStyle(match.away_team.away_team_name)}
-                                />
-                                <TeamAcronym>{match.away_team.away_team_acronym}</TeamAcronym>
-                            </div>
-                        </TeamRow>
-                        <MatchInfo>
-                            {new Date(match.date).toLocaleDateString('es-EC')} {match.time}
-                        </MatchInfo>
-                    </MatchCard>
-                ))}
-            </ul>
+                        </section>
+                    );
+                })}
+            </div>
         </div>
     );
 };

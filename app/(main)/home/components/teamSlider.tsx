@@ -10,21 +10,14 @@ import "slick-carousel/slick/slick-theme.css";
 
 function TeamsSlider() {
 
-    const skeleton = [
-        <div key={0} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={1} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={2} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={3} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={4} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={5} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={6} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={7} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={8} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={9} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={10} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
-        <div key={11} className=" animate-pulse bg-primaryBlueColor h-24 w-20 rounded-lg"></div>,
+    const skeleton = Array.from({ length: 12 }, (_, i) => (
+        <div
+            key={i}
+            className="animate-pulse h-24 w-20 rounded my-2 mx-1"
+            style={{ background: 'var(--card-stripe)', border: '1px solid var(--border)' }}
+        />
+    ));
 
-    ]
 
     const [teamsData, setTeamsData] = useState<React.ReactElement[]>([]);
 
@@ -108,7 +101,13 @@ function TeamsSlider() {
     };
 
     return (
-        <div className='mx-4'>
+        <div
+            className="rounded overflow-hidden px-2 py-4 sm:px-4"
+            style={{
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+            }}
+        >
             <Slider {...settings}>
                 {teamsData.length == 0 ? charge : teamsData}
             </Slider>

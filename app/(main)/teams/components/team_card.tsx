@@ -1,21 +1,14 @@
 
 'use client'
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation'
 import { TeamMainInfo } from "@/app/lib/types/team.interface";
-import { getTeamLogoUrl } from '@/app/lib/services/teams.service';
+import { resolveTeamLogoPath } from '@/app/lib/teamLocalLogos';
 
 export default function TeamCard({ team }: { team: TeamMainInfo }) {
-    const [image, setImage] = useState('');
+    const image = resolveTeamLogoPath(team.name);
     const router = useRouter();
-
-    useEffect(() => {
-        async function fetchImage() {
-            setImage(await getTeamLogoUrl({ teamId: team.id }));
-        }
-        fetchImage();
-    }, [team.id]);
 
     async function openSinglePage() {
         router.push(`/teams/${team.name}=${team.id}`);
@@ -23,43 +16,93 @@ export default function TeamCard({ team }: { team: TeamMainInfo }) {
 
     const truncateText = (text: string, maxLength: number) => {
         const upperCaseText = text.toUpperCase();
-        const truncatedText = upperCaseText.length > maxLength ? `${upperCaseText.slice(0, maxLength)}...` : upperCaseText;
-        return truncatedText;
+        return upperCaseText.length > maxLength ? `${upperCaseText.slice(0, maxLength)}...` : upperCaseText;
     };
 
-    return <>
-        <div className="m-4">
-            <div onClick={openSinglePage}
-                className="cursor-pointer hover:cursor-pointer bg-primaryBlueColor h-24 w-72 grid grid-cols-3 gap-0 justify-start items-center rounded-lg">
-                <div className="w-8">
-                    <div className="ml-2 w-18 h-full p-1 overflow-hidden">
-                        {image ? (
-                            <Image
-                                src={image}
-                                width={100}
-                                height={100}
-                                alt="Logo del equipo"
-                                className="w-full h-full"
-                            />
-                        ) : (
-                            <div className="w-full h-full animate-pulse bg-gray-300 rounded-full" />
-                        )}
-                    </div>
-                </div>
-                <div className="ml-2 w-36 grid-rows-2">
-                    <div className="max-w-xs">
-                        <p className="mb-1 text-whiteColor body-font font-roboto font-bold text-[0.9rem]">{truncateText(team.name, 14)}</p>
-                    </div>
-                    <p className="flex items-center gap-2 text-whiteColor body-font font-roboto font-regular text-sm">
-                        <svg width="16" height="16" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2.21799 3.52117L4.68772 2.42351C5.20485 2.19368 5.79515 2.19368 6.31228 2.42351L8.78201 3.52117C9.10665 3.66546 9.10665 4.12621 8.78201 4.2705L6.31228 5.36815C5.79515 5.59799 5.20485 5.59799 4.68772 5.36815L2.21799 4.2705C1.89335 4.12621 1.89335 3.66546 2.21799 3.52117Z" stroke="#2BD09C" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M9.39584 3.89583V5.72917" stroke="#2BD09C" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M2.97916 4.8125V7.10417C2.97916 7.10417 3.20832 8.02083 5.49999 8.02083C7.79166 8.02083 8.02082 7.10417 8.02082 7.10417V4.8125" stroke="#2BD09C" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        {team.career_acronym}</p>
+    return (
+        <button
+            type="button"
+            onClick={openSinglePage}
+            className="group relative flex w-full items-center overflow-hidden rounded-xl text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+            style={{
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+            }}
+            onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'var(--accent)';
+                el.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)';
+            }}
+            onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'var(--border)';
+                el.style.boxShadow = '';
+            }}
+        >
+            {/* Contenedor del Logo (Izquierda) */}
+            <div 
+                className="relative flex h-20 w-20 shrink-0 items-center justify-center p-3 sm:h-24 sm:w-24"
+                style={{ background: 'var(--card-stripe)' }}
+            >
+                {/* Patrón sutil de fondo en el contenedor del logo */}
+                <div 
+                    className="absolute inset-0 opacity-10 mix-blend-overlay"
+                    style={{ background: 'var(--accent)' }}
+                    aria-hidden
+                />
+                <Image
+                    src={image}
+                    width={64}
+                    height={64}
+                    alt={team.name}
+                    className="relative z-10 h-full w-full object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-110"
+                    unoptimized
+                />
+            </div>
+
+            {/* Información del Equipo (Derecha) */}
+            <div className="flex flex-1 flex-col justify-center px-4 py-3 min-w-0">
+                <p
+                    className="font-roboto text-base font-bold leading-tight sm:text-lg line-clamp-2"
+                    style={{ color: 'var(--foreground)' }}
+                    title={team.name}
+                >
+                    {team.name}
+                </p>
+                
+                <div
+                    className="mt-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--muted)' }}
+                >
+                    <span 
+                        className="flex h-5 items-center justify-center rounded px-2 text-[10px]"
+                        style={{ background: 'var(--accent-muted)', color: 'var(--accent)' }}
+                    >
+                        {team.career_acronym}
+                    </span>
                 </div>
             </div>
-        </div>
 
-    </>
+            {/* Decoración lateral interactiva (Flecha) */}
+            <div className="flex h-full items-center justify-center pr-4">
+                <div 
+                    className="flex h-6 w-6 items-center justify-center rounded-full border opacity-40 transition-all duration-300 group-hover:opacity-100"
+                    style={{ 
+                        borderColor: 'var(--border)', 
+                        color: 'var(--foreground)'
+                    }}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 transition-transform group-hover:translate-x-0.5">
+                        <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                    </svg>
+                </div>
+            </div>
+
+            {/* Borde inferior de acento invisible que aparece en hover */}
+            <div 
+                className="absolute bottom-0 left-0 h-1 w-full translate-y-full transition-transform duration-300 group-hover:translate-y-0"
+                style={{ background: 'var(--accent)' }}
+            />
+        </button>
+    );
 }

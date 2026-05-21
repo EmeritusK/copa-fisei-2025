@@ -1,13 +1,167 @@
-'use client'
-import React, { useState, useEffect } from "react";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { getStandings } from '../../../lib/services/ranking.service';
-import { RankingResponse } from "../../../lib/types/ranking.interface";
+import { Group, RankingResponse } from '../../../lib/types/ranking.interface';
 import { resolveTeamLogoPath } from '@/app/lib/teamLocalLogos';
 import { teamLogoImageStyle } from '@/app/lib/teamLogoDisplay';
-import { useRouter } from "next/navigation";
+
+/* ── Position marker — left-border accent ── */
+function positionMarkerStyle(index: number): React.CSSProperties {
+    if (index === 0) return { color: 'var(--pos-gold)', fontWeight: 700 };
+    if (index === 1) return { color: 'var(--pos-silver)', fontWeight: 700 };
+    if (index === 2) return { color: 'var(--pos-bronze)', fontWeight: 700 };
+    return { color: 'var(--muted)', fontWeight: 600 };
+}
+
+/* Left border on qualifying places (top 2) */
+function rowStyle(index: number): React.CSSProperties {
+    const isQualifying = index < 2;
+    const isEven = index % 2 === 0;
+    
+    return {
+        ...(isQualifying ? { borderLeft: '3px solid var(--accent)' } : {}),
+        ...(isEven ? { background: 'var(--card-stripe)' } : {}),
+    };
+}
+
+function TeamLogoCell({ teamName }: { teamName: string }) {
+    const src = resolveTeamLogoPath(teamName);
+    return (
+        <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded p-0.5"
+            style={{ background: 'var(--card-stripe)' }}
+        >
+            <Image
+                src={src}
+                alt=""
+                width={36}
+                height={36}
+                className="h-8 w-8 object-contain"
+                style={teamLogoImageStyle(teamName)}
+                unoptimized
+            />
+        </div>
+    );
+}
+
+function RankingRow({
+    team,
+    index,
+    onOpen,
+}: {
+    team: Group;
+    index: number;
+    onOpen: () => void;
+}) {
+    return (
+        <tr
+            style={rowStyle(index)}
+            className="transition-colors hover:bg-[var(--card-hover)]"
+        >
+            <td className="w-10 py-3 pl-4 text-center">
+                <span className="text-sm tabular-nums" style={positionMarkerStyle(index)}>
+                    {index + 1}
+                </span>
+            </td>
+            <td className="py-3 pr-3 pl-2">
+                <button
+                    type="button"
+                    onClick={onOpen}
+                    className="flex min-w-0 items-center gap-3 text-left transition-opacity hover:opacity-70"
+                >
+                    <TeamLogoCell teamName={team.team_name} />
+                    <span
+                        className="truncate text-sm font-semibold"
+                        style={{ color: 'var(--foreground)' }}
+                    >
+                        {team.team_name}
+                    </span>
+                </button>
+            </td>
+            {/* Stats */}
+            {[
+                team.matches_played,
+                team.wins,
+                team.draws,
+                team.losses,
+                `${team.goals_for}-${team.goals_against}`,
+                team.goal_difference > 0 ? `+${team.goal_difference}` : team.goal_difference,
+            ].map((val, i) => (
+                <td
+                    key={i}
+                    className="px-3 py-3 text-center text-sm tabular-nums"
+                    style={{ color: 'var(--muted)' }}
+                >
+                    {val}
+                </td>
+            ))}
+            <td className="py-3 pr-4 text-center">
+                <span
+                    className="inline-block min-w-[2rem] px-2 py-0.5 text-sm font-bold tabular-nums rounded"
+                    style={{
+                        background: 'var(--accent)',
+                        color: '#fff',
+                    }}
+                >
+                    {team.points}
+                </span>
+            </td>
+        </tr>
+    );
+}
+
+function RankingMobileRow({
+    team,
+    index,
+    onOpen,
+}: {
+    team: Group;
+    index: number;
+    onOpen: () => void;
+}) {
+    return (
+        <li
+            style={{
+                ...rowStyle(index),
+                borderBottom: '1px solid var(--border)',
+            }}
+        >
+            <button
+                type="button"
+                onClick={onOpen}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--card-hover)]"
+            >
+                <span
+                    className="w-5 shrink-0 text-center text-sm tabular-nums"
+                    style={positionMarkerStyle(index)}
+                >
+                    {index + 1}
+                </span>
+                <TeamLogoCell teamName={team.team_name} />
+                <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
+                        {team.team_name}
+                    </p>
+                    <p className="mt-0.5 text-xs" style={{ color: 'var(--muted)' }}>
+                        {team.wins}V · {team.draws}E · {team.losses}D &nbsp;·&nbsp; {team.goals_for}-{team.goals_against}
+                    </p>
+                </div>
+                <span
+                    className="shrink-0 text-sm font-bold tabular-nums rounded px-2 py-0.5"
+                    style={{ background: 'var(--accent)', color: '#fff' }}
+                >
+                    {team.points}
+                </span>
+            </button>
+        </li>
+    );
+}
 
 export const TablePosicion = () => {
     const [positions, setPositions] = useState<RankingResponse | null>(null);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
@@ -17,96 +171,121 @@ export const TablePosicion = () => {
                 setPositions(ranking);
             } catch (error) {
                 console.error('Error fetching ranking data:', error);
+            } finally {
+                setLoading(false);
             }
         };
-
         fetchRanking();
     }, []);
 
-    async function openSinglePage({teamName, teamId}: {teamName: string, teamId: string}) {
+    function openTeam(teamName: string, teamId: string) {
         router.push(`/teams/${teamName}=${teamId}`);
     }
 
-    const groupEntries = Object.entries(positions?.data ?? {});
+    const groupEntries = Object.entries(positions?.data ?? {}).sort(([a], [b]) =>
+        a.localeCompare(b, 'es')
+    );
 
-    return (
-        <>
-            <div className="container   px-4 mx-auto sm:px-8 ">
-                {groupEntries.map(([groupName, teams]) => (
-                    <div className="py-5" key={groupName}>
-                        <div className="flex flex-row justify-between  w-full mb-1 sm:mb-0">
-                            <h2 className="text-3xl leading-tight m-2 font-roboto font-bold text-foreground">
-                                {`GRUPO ${groupName}`}
-                            </h2>
-                        </div>
-                        <div className="px-4 py-0 -mx-4 overflow-x-auto sm:-mx-8 sm:px-8">
-                            <div className="inline-block min-w-full overflow-hidden rounded-lg ">
-                                <table className="min-w-full leading-normal">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" className=" w-1  text-md font-mono font-semibold text-left  border-b border-bgColor"></th>
-                                            <th scope="col" className="  px-5 py-1 w-2 text-md font-mono font-semibold text-left  border-b border-bgColor"></th>
-                                            <th scope="col" className="px-5 py-1  text-lg font-mono font-normal  text-left text-gray-400   border-b border-bgColor"></th>
-                                            <th scope="col" className="px-7 py-1 w-2 text-md font-mono font-semibold text-right text-greyColor   border-b border-bgColor">Partidos</th>
-                                            <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">V</th>
-                                            <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor  border-b border-bgColor">E</th>
-                                            <th scope="col" className="px-2 py-1 w-2 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">D</th>
-                                            <th scope="col" className=" py-1 w-4 text-md font-mono font-semibold text-center text-greyColor   border-b border-bgColor">Goles</th>
-                                            <th scope="col" className="px-5 py-1 w-2 text-md font-mono font-semibold text-center  text-greyColor   border-b border-bgColor">+/-</th>
-                                            <th scope="col" className="px-5 py-1 w-2 text-md font-mono  text-right text-greyColor  border-b border-bgColor">Puntos</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {teams.map((team, index) => (
-                                            <tr key={team.team_id}>
-                                                <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                    <p className="text-greyColor">{index + 1}</p>
-                                                </td>
-                                                <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                    <img
-                                                        src={resolveTeamLogoPath(team.team_name)}
-                                                        alt={team.team_name}
-                                                        width={40}
-                                                        height={40}
-                                                        className="block h-10 w-10 object-contain"
-                                                        style={teamLogoImageStyle(team.team_name)}
-                                                    />
-                                                </td>
-                                                <td className="px-5 py-2 text-sm border-b border-bgColor">
-                                                    <p className="text-foreground font-semibold hover:text-greyColor cursor-pointer" onClick={() => openSinglePage({teamName: team.team_name, teamId: team.team_id})}>{team.team_name}</p>
-                                                </td>
-                                                <td className="px-5 py-2 text-sm border-b border-bgColor text-center">
-                                                    <p className="text-greyColor">{team.matches_played}</p>
-                                                </td>
-                                                <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                    <p className="text-greyColor">{team.wins}</p>
-                                                </td>
-                                                <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                    <p className="text-greyColor">{team.draws}</p>
-                                                </td>
-                                                <td className="px-2 py-2 text-sm text-center border-b border-bgColor">
-                                                    <p className="text-greyColor">{team.losses}</p>
-                                                </td>
-                                                <td className="px-3 py-2 text-sm text-center border-b border-bgColor">
-                                                    <p className="text-greyColor min-w-[60px]">{team.goals_for} - {team.goals_against}</p>
-                                                </td>
-                                                <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                    <p className="text-greyColor">{team.goal_difference}</p>
-                                                </td>
-                                                <td className="px-5 py-2 text-sm text-center border-b border-bgColor">
-                                                    <p className="text-greyColor">{team.points}</p>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                                <div className="flex flex-col items-center px-5 py-5 bg-primaryBlueColor xs:flex-row xs:justify-between border-t border-bgColor"></div>
-                            </div>
-                        </div>
-                    </div>
+    if (loading) {
+        return (
+            <div className="mx-auto max-w-5xl space-y-6 px-3 sm:px-4">
+                {[1, 2].map((n) => (
+                    <div
+                        key={n}
+                        className="h-56 animate-pulse rounded"
+                        style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+                    />
                 ))}
             </div>
-        </>
+        );
+    }
+
+    if (groupEntries.length === 0) {
+        return (
+            <p className="py-16 text-center text-sm" style={{ color: 'var(--muted)' }}>
+                No hay datos de clasificación disponibles.
+            </p>
+        );
+    }
+
+    return (
+        <div className="mx-auto max-w-5xl space-y-8 px-3 pb-8 sm:px-4">
+            {groupEntries.map(([groupName, teams]) => (
+                <section
+                    key={groupName}
+                    className="overflow-hidden rounded-lg"
+                    style={{
+                        background: 'var(--card)',
+                        border: '1px solid var(--border)',
+                    }}
+                >
+                    {/* Group header */}
+                    <header
+                        className="flex items-center gap-3 px-4 py-3.5"
+                        style={{
+                            borderBottom: '1px solid var(--border)',
+                            background: 'var(--card-stripe)',
+                        }}
+                    >
+                        <span
+                            className="block w-1 h-5 rounded-sm shrink-0"
+                            style={{ background: 'var(--accent)' }}
+                            aria-hidden
+                        />
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--foreground)' }}>
+                            Grupo {groupName}
+                        </h2>
+                    </header>
+
+                    {/* Desktop table */}
+                    <div className="hidden overflow-x-auto md:block">
+                        <table className="w-full min-w-[600px]">
+                            <thead>
+                                <tr
+                                    className="text-[10px] font-bold uppercase tracking-wider"
+                                    style={{
+                                        color: 'var(--muted)',
+                                        borderBottom: '1px solid var(--border)',
+                                        background: 'var(--card-stripe)',
+                                    }}
+                                >
+                                    <th className="w-10 py-2.5 pl-4 text-center">#</th>
+                                    <th className="py-2.5 pl-2 text-left">Equipo</th>
+                                    <th className="px-3 py-2.5 text-center">PJ</th>
+                                    <th className="px-3 py-2.5 text-center">V</th>
+                                    <th className="px-3 py-2.5 text-center">E</th>
+                                    <th className="px-3 py-2.5 text-center">D</th>
+                                    <th className="px-3 py-2.5 text-center">GF-GC</th>
+                                    <th className="px-3 py-2.5 text-center">+/-</th>
+                                    <th className="py-2.5 pr-4 text-center">Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {teams.map((team, index) => (
+                                    <RankingRow
+                                        key={team.team_id}
+                                        team={team}
+                                        index={index}
+                                        onOpen={() => openTeam(team.team_name, team.team_id)}
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile list */}
+                    <ul className="md:hidden">
+                        {teams.map((team, index) => (
+                            <RankingMobileRow
+                                key={team.team_id}
+                                team={team}
+                                index={index}
+                                onOpen={() => openTeam(team.team_name, team.team_id)}
+                            />
+                        ))}
+                    </ul>
+                </section>
+            ))}
+        </div>
     );
 };
-
