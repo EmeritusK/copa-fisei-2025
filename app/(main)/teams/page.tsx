@@ -26,26 +26,48 @@ export default function Page() {
 
     return (
         <div className="pb-12">
-            <header className="mx-auto max-w-5xl px-3 pt-6 pb-6 sm:px-4">
-                <p
-                    className="text-[10px] font-bold uppercase tracking-[0.25em]"
-                    style={{ color: 'var(--accent)' }}
-                >
-                    Copa FISEI 2026
-                </p>
-                <h1
-                    className="mt-1 section-title font-roboto text-2xl font-bold tracking-tight sm:text-3xl"
-                    style={{ color: 'var(--foreground)' }}
-                >
-                    Equipos
-                </h1>
-                <p className="mt-1 text-sm" style={{ color: 'var(--muted)' }}>
-                    {teams.length > 0 ? `${teams.length} equipos participantes` : 'Cargando equipos…'}
-                </p>
+            <header
+                className="relative overflow-hidden px-4 py-12 sm:px-6"
+                style={{
+                    background: 'var(--header-bg)',
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                }}
+            >
+                {/* Patrón de fondo */}
+                <div
+                    className="absolute inset-0 opacity-[0.035]"
+                    style={{
+                        backgroundImage: `repeating-linear-gradient(
+                            -55deg,
+                            #ffffff 0,
+                            #ffffff 1px,
+                            transparent 1px,
+                            transparent 16px
+                        )`,
+                    }}
+                    aria-hidden
+                />
+                
+                <div className="relative mx-auto max-w-5xl">
+                    <p
+                        className="text-[10px] font-bold uppercase tracking-[0.25em]"
+                        style={{ color: 'var(--accent)' }}
+                    >
+                        Copa FISEI 2026
+                    </p>
+                    <h1 className="mt-2 font-roboto text-3xl font-black uppercase tracking-tight text-white sm:text-4xl">
+                        Equipos Participantes
+                    </h1>
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                        {teams.length > 0 
+                            ? `Conoce a los ${teams.length} equipos que compiten por la gloria en esta edición. Explora sus plantillas y escudos oficiales.`
+                            : 'Cargando equipos…'}
+                    </p>
+                </div>
             </header>
 
-            <div className="mx-auto max-w-5xl px-1 sm:px-4">
-                <div className="flex flex-wrap items-start justify-center gap-0">
+            <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {teams.map((team) => (
                         <TeamCard team={team} key={team.id} />
                     ))}

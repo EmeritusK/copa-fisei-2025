@@ -157,10 +157,9 @@ export default function HomeHero() {
 
                 {/* Stats row */}
                 <div
-                    className="mt-10 grid grid-cols-2 sm:grid-cols-4 divide-x"
+                    className="mt-10 grid grid-cols-2 sm:grid-cols-4"
                     style={{
                         borderTop: '1px solid rgba(255,255,255,0.08)',
-                        divideColor: 'rgba(255,255,255,0.08)',
                     }}
                 >
                     {stats.map(({ value, label }) => (
@@ -191,9 +190,7 @@ export default function HomeHero() {
                 className="relative mt-0"
                 style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.25)' }}
             >
-                <div className="mx-auto flex max-w-5xl divide-x"
-                    style={{ divideColor: 'rgba(255,255,255,0.06)' }}
-                >
+                <div className="mx-auto flex max-w-5xl">
                     {navLinks.map(({ href, label, desc, icon }) => (
                         <Link
                             key={href}
