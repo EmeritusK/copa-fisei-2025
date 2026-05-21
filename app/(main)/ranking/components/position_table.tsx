@@ -16,12 +16,15 @@ function positionMarkerStyle(index: number): React.CSSProperties {
     return { color: 'var(--muted)', fontWeight: 600 };
 }
 
-/* Left border on first place row */
+/* Left border on qualifying places (top 2) */
 function rowStyle(index: number): React.CSSProperties {
-    if (index === 0) {
-        return { borderLeft: '3px solid var(--accent)', background: 'var(--card-stripe)' };
-    }
-    return index % 2 === 0 ? { background: 'var(--card-stripe)' } : {};
+    const isQualifying = index < 2;
+    const isEven = index % 2 === 0;
+    
+    return {
+        ...(isQualifying ? { borderLeft: '3px solid var(--accent)' } : {}),
+        ...(isEven ? { background: 'var(--card-stripe)' } : {}),
+    };
 }
 
 function TeamLogoCell({ teamName }: { teamName: string }) {
@@ -221,7 +224,7 @@ export const TablePosicion = () => {
                         className="flex items-center gap-3 px-4 py-3.5"
                         style={{
                             borderBottom: '1px solid var(--border)',
-                            background: 'var(--header-bg)',
+                            background: 'var(--card-stripe)',
                         }}
                     >
                         <span
@@ -229,7 +232,7 @@ export const TablePosicion = () => {
                             style={{ background: 'var(--accent)' }}
                             aria-hidden
                         />
-                        <h2 className="text-sm font-bold uppercase tracking-wider text-white">
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--foreground)' }}>
                             Grupo {groupName}
                         </h2>
                     </header>

@@ -9,7 +9,7 @@ const Footer = () => {
         <footer
             style={{
                 background: 'var(--header-bg)',
-                borderTop: '3px solid var(--accent)',
+                boxShadow: '0 -1px 0 rgba(255, 255, 255, 0.03)',
             }}
         >
             <div className="mx-auto max-w-5xl px-6 py-10">
@@ -139,9 +139,7 @@ const Footer = () => {
                     <p className="text-xs" style={{ color: 'rgba(255,255,255,0.30)' }}>
                         &copy; {new Date().getFullYear()} Copa FISEI. Todos los derechos reservados.
                     </p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.30)' }}>
-                        Desarrollado por Marlon M. · Mateo D. · Jair P. · William P.
-                    </p>
+
                 </div>
             </div>
         </footer>

@@ -1,0 +1,9 @@
+-- Los 24 equipos ya están en Postgres. Solo referencia (nombres exactos del MCP):
+--
+-- A: Medallo, Latencia Cero FC, Japon, Los Tiguerones FC, Atletico IESS FC, Control+Z
+-- B: Warriors, Resaca FC, Nexo FC, Hello World FC, Pythones FC, Gauss FC
+-- C: Chugchas, Portuñaña, Ojala Graduarnos, Club Sportmatozoide, Galaxy FC, Los Inquietos del Espacio
+-- D: Marsella, Cubateros FC, Vodka Juniors, Apriori FC, Ingenieros AA, Los Jogo Bonito
+--
+-- Planilla → BD: Por tu ñaña → Portuñaña | Los Tiguerones → Los Tiguerones FC
+--              Helios World → Hello World FC | Sportmatozoide → Club Sportmatozoide

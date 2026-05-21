@@ -112,18 +112,31 @@ const Header = () => {
             </div>
 
             {/* ── Mobile header ── */}
-            <div className="app-header sticky top-0 z-50 flex lg:hidden items-center justify-between px-4 py-3">
-                <div className="flex items-center gap-2">
+            <div className="app-header sticky top-0 z-50 flex lg:hidden items-center justify-between px-4 py-3 relative">
+                {/* Espaciador invisible a la izquierda para balancear los botones de la derecha */}
+                <div className="w-16" />
+
+                {/* Logo + Texto centrados absolutamente */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
                     <Image
                         priority
                         src={fiseiLogo}
                         alt="Copa FISEI"
-                        width={100}
-                        height={32}
+                        width={72}
+                        height={72}
                         className="h-8 w-auto brightness-0 invert"
                     />
+                    <div className="border-l border-white/20 pl-3">
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/50 leading-none">
+                            Copa FISEI
+                        </p>
+                        <p className="mt-0.5 text-xs font-bold text-white leading-tight">
+                            2026
+                        </p>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
+
+                <div className="flex items-center gap-1 relative z-10">
                     <button
                         onClick={toggleTheme}
                         aria-label="Toggle theme"

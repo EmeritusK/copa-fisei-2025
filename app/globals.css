@@ -6,10 +6,12 @@
   --foreground: #0d0d0d;
   --surface: #ffffff;
 
-  /* ── Acento Copa FISEI ── */
-  --accent: #c0161e;          /* rojo carmesí institucional */
-  --accent-hover: #a01118;
-  --accent-muted: #fde8e9;
+  /* ── Acento Copa FISEI — índigo sobrio ── */
+  --accent: #4338CA;
+  /* índigo profundo, Premier League-inspired */
+  --accent-hover: #3730A3;
+  --accent-muted: #EEF2FF;
+  /* índigo muy claro para fondos */
 
   /* ── Neutros ── */
   --muted: #6b7280;
@@ -23,7 +25,8 @@
   --card-stripe: #f8f8f8;
 
   /* ── Header ── */
-  --header-bg: #0a0f1e;       /* navy profundo */
+  --header-bg: #0a0f1e;
+  /* navy profundo */
   --header-fg: #ffffff;
   --header-accent: var(--accent);
 
@@ -35,7 +38,7 @@
   /* ── Interactivos ── */
   --btn-primary: var(--accent);
   --btn-primary-hover: var(--accent-hover);
-  --focus-ring: rgba(192, 22, 30, 0.25);
+  --focus-ring: rgba(67, 56, 202, 0.25);
 
   /* ── Legados (no romper componentes existentes) ── */
   --primaryBlueColor: #f0f0f0;
@@ -87,9 +90,10 @@ html[data-theme="dark"] {
   --foreground: #f0f0f0;
   --surface: #111119;
 
-  --accent: #e8242d;
-  --accent-hover: #c01822;
-  --accent-muted: #2a0507;
+  --accent: #818CF8;
+  /* índigo claro, brilla en dark mode */
+  --accent-hover: #6366F1;
+  --accent-muted: #1e1b4b;
 
   --muted: #8b929e;
   --muted-light: #6b7280;
@@ -131,33 +135,61 @@ body {
   font-family: var(--font-roboto), sans-serif;
 }
 
-/* ── Header: barra sólida navy sin gradiente ── */
+/* ── Header: sombra sutil, sin borde de acento ── */
 .app-header {
   background: var(--header-bg);
-  border-bottom: 3px solid var(--accent);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 3px; height: 3px; }
-::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-* { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
 
 /* ── Slick slider ── */
 .slick-prev:before,
-.slick-next:before { color: var(--foreground) !important; }
-.slick-slider { overflow: hidden; }
+.slick-next:before {
+  color: var(--foreground) !important;
+}
+
+.slick-slider {
+  overflow: hidden;
+}
 
 @media (max-width: 768px) {
-  .slick-slider { padding: 0 8px; }
-  .slick-list { overflow: visible; }
-  .slick-dots { bottom: -18px; }
+  .slick-slider {
+    padding: 0 8px;
+  }
+
+  .slick-list {
+    overflow: visible;
+  }
+
+  .slick-dots {
+    bottom: -18px;
+  }
 }
 
 .slick-dots li button:before {
   color: var(--muted) !important;
   opacity: 0.5 !important;
 }
+
 .slick-dots li.slick-active button:before {
   color: var(--accent) !important;
   opacity: 1 !important;
@@ -169,6 +201,7 @@ body {
   align-items: center;
   gap: 10px;
 }
+
 .section-title::before {
   content: '';
   display: block;
@@ -178,4 +211,3 @@ body {
   border-radius: 2px;
   flex-shrink: 0;
 }
-
