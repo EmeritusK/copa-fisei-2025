@@ -7,15 +7,20 @@ export async function GET(request: Request) {
   const limit = parseInt(searchParams.get("limit") || "5");
   const skip = (page - 1) * limit;
   const search = searchParams.get("search") || "";
+  const statusParam = searchParams.get("status") || "";
 
-  const whereClause: any = search
-    ? {
-        OR: [
-          { homeTeam: { name: { contains: search, mode: "insensitive" } } },
-          { awayTeam: { name: { contains: search, mode: "insensitive" } } },
-        ],
-      }
-    : {};
+  const whereClause: any = {};
+  
+  if (search) {
+    whereClause.OR = [
+      { homeTeam: { name: { contains: search, mode: "insensitive" } } },
+      { awayTeam: { name: { contains: search, mode: "insensitive" } } },
+    ];
+  }
+
+  if (statusParam && statusParam !== "all") {
+    whereClause.status = statusParam;
+  }
 
   try {
     const matches = await prisma.match.findMany({

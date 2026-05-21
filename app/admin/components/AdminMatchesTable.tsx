@@ -10,17 +10,18 @@ export default function AdminMatchesTable() {
   const [meta, setMeta] = useState<any>(null);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchMatches();
-  }, [page, searchTerm]);
+  }, [page, searchTerm, statusFilter]);
 
   const fetchMatches = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/matches?page=${page}&limit=5&search=${encodeURIComponent(searchTerm)}`);
+      const res = await fetch(`/api/admin/matches?page=${page}&limit=5&search=${encodeURIComponent(searchTerm)}&status=${encodeURIComponent(statusFilter)}`);
       const data = await res.json();
       if (data.data) {
         setMatches(data.data);
@@ -70,13 +71,32 @@ export default function AdminMatchesTable() {
             <h1 className="text-2xl font-bold text-foreground">Administración de Partidos</h1>
             <p className="text-sm text-muted mt-1">Ingresa resultados y detalles de los encuentros.</p>
           </div>
-          <input 
-            type="text" 
-            placeholder="Buscar por equipo..." 
-            value={searchTerm}
-            onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-            className="px-4 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent w-full sm:w-64"
-          />
+          
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="relative flex items-center">
+              <select
+                value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                className="appearance-none bg-transparent border border-transparent hover:bg-surface rounded-lg py-2 pl-3 pr-8 text-sm text-muted hover:text-foreground focus:outline-none transition-colors cursor-pointer"
+              >
+                <option value="all">Todos los estados</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="En curso">En curso</option>
+                <option value="Finalizado">Finalizado</option>
+              </select>
+              <div className="pointer-events-none absolute right-2 flex items-center text-muted">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+
+            <input 
+              type="text" 
+              placeholder="Buscar por equipo..." 
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+              className="px-4 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent w-full sm:w-64"
+            />
+          </div>
         </div>
 
         <div className="overflow-x-auto">

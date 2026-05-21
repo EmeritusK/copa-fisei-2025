@@ -135,6 +135,10 @@ body {
   font-family: var(--font-roboto), sans-serif;
 }
 
+button {
+  cursor: pointer;
+}
+
 /* ── Header: sombra sutil, sin borde de acento ── */
 .app-header {
   background: var(--header-bg);

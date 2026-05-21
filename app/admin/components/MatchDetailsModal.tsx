@@ -18,7 +18,7 @@ interface MatchDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   match: any;
-  onSave: (details: MatchDetails) => void;
+  onSave: (details: MatchDetails) => Promise<void> | void;
 }
 
 export default function MatchDetailsModal({
@@ -33,6 +33,7 @@ export default function MatchDetailsModal({
   });
   
   const [activeTab, setActiveTab] = useState<"home" | "away">("home");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (match?.details) {
@@ -115,8 +116,18 @@ export default function MatchDetailsModal({
     setDetails(updated);
   };
 
-  const handleSave = () => {
-    onSave(details);
+  const isFormValid = () => {
+    const allGoalsValid = details.homeTeam.goals.every(g => g.playerId) && details.awayTeam.goals.every(g => g.playerId);
+    const allCardsValid = details.homeTeam.cards.every(c => c.playerId) && details.awayTeam.cards.every(c => c.playerId);
+    return allGoalsValid && allCardsValid;
+  };
+
+  const handleSave = async () => {
+    if (isFormValid()) {
+      setIsSaving(true);
+      await onSave(details);
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -186,7 +197,7 @@ export default function MatchDetailsModal({
                     <select
                       value={goal.playerId}
                       onChange={(e) => handleUpdateGoal(index, "playerId", e.target.value)}
-                      className="flex-1 min-w-[200px] bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-foreground"
+                      className={`flex-1 min-w-[200px] bg-background border ${!goal.playerId ? 'border-red-500' : 'border-border'} rounded-md pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-foreground`}
                     >
                       <option value="" disabled>Seleccionar Jugador...</option>
                       {players.map((p: any) => (
@@ -229,7 +240,7 @@ export default function MatchDetailsModal({
                     <select
                       value={card.playerId}
                       onChange={(e) => handleUpdateCard(index, "playerId", e.target.value)}
-                      className="flex-1 min-w-[200px] bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-foreground"
+                      className={`flex-1 min-w-[200px] bg-background border ${!card.playerId ? 'border-red-500' : 'border-border'} rounded-md pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-foreground`}
                     >
                       <option value="" disabled>Seleccionar Jugador...</option>
                       {players.map((p: any) => (
@@ -242,7 +253,7 @@ export default function MatchDetailsModal({
                     <select
                       value={card.type}
                       onChange={(e) => handleUpdateCard(index, "type", e.target.value)}
-                      className="w-32 bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-foreground"
+                      className="w-32 bg-background border border-border rounded-md pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-foreground"
                     >
                       <option value="yellow">Amarilla</option>
                       <option value="red">Roja</option>
@@ -264,6 +275,11 @@ export default function MatchDetailsModal({
 
         {/* Footer */}
         <div className="p-5 border-t border-border flex justify-end gap-3 bg-surface">
+          {!isFormValid() && (
+            <span className="text-red-500 text-sm flex items-center mr-auto">
+              Selecciona un jugador en todos los campos
+            </span>
+          )}
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-background border border-border transition-colors"
@@ -272,9 +288,20 @@ export default function MatchDetailsModal({
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent-hover transition-colors shadow-md"
+            disabled={!isFormValid() || isSaving}
+            className="px-4 py-2 flex items-center justify-center gap-2 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent-hover transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
           >
-            Guardar Detalles
+            {isSaving ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Guardando...
+              </>
+            ) : (
+              "Guardar Detalles"
+            )}
           </button>
         </div>
       </div>
